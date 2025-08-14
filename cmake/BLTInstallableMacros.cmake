@@ -412,6 +412,13 @@ macro(blt_add_target_compile_flags)
     # Only add the flag if it is not empty
     string(STRIP "${arg_FLAGS}" _strippedFlags)
     if(NOT "${_strippedFlags}" STREQUAL "")
+        # COMPILE_OPTIONS and INTERFACE_COMPILE_OPTIONS are semicolon-delimited lists,
+        # but the string in arg_FLAGS may be a space-delimited string of command line options.
+        # Note: "SHELL:"" causes the flags to be not de-duplicated and parsed with
+        # separate_arguments
+        if(NOT "${_strippedFlags}" MATCHES SHELL:)
+            set(_strippedFlags "SHELL:${_strippedFlags}")
+        endif()
         get_target_property(_target_type ${arg_TO} TYPE)
         if (("${_target_type}" STREQUAL "INTERFACE_LIBRARY") AND (${CMAKE_VERSION} VERSION_LESS "3.11.0"))
             set_property(TARGET ${arg_NAME} APPEND PROPERTY
