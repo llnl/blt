@@ -70,6 +70,14 @@ endif()
 message(STATUS "BLT OpenMP Compile Flags: ${_compile_flags}")
 message(STATUS "BLT OpenMP Link Flags:    ${_link_flags}")
 
+# COMPILE_OPTIONS and INTERFACE_COMPILE_OPTIONS are semicolon-delimited lists,
+# but the string in _compile_flags may be a space-delimited string of command line options.
+# "SHELL:" causes the flags to be not de-duplicated and parsed with separate_arguments.
+# Ref https://github.com/llnl/blt/issues/723
+if(NOT "${_compile_flags}" MATCHES SHELL:)
+    set(_compile_flags "SHELL:${_compile_flags}")
+endif()
+
 blt_import_library(NAME          openmp
                    COMPILE_FLAGS ${_compile_flags}
                    LINK_FLAGS    ${_link_flags}
