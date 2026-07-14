@@ -38,8 +38,8 @@ set(MPIEXEC          "${MPI_BASE_DIR}/mpiexec" CACHE PATH "")
 ########################################################################
 set(ENABLE_CUDA ON CACHE BOOL "")
 
-set(CUDA_TOOLKIT_ROOT_DIR "/Developer/NVIDIA/CUDA-8.0/" CACHE PATH "")
-set(CUDA_BIN_DIR          "/Developer/NVIDIA/CUDA-8.0/bin/" CACHE PATH "")
+set(CUDAToolkit_ROOT "/Developer/NVIDIA/CUDA-8.0/" CACHE PATH "")
+set(CUDA_BIN_DIR          "${CUDAToolkit_ROOT}/bin/" CACHE PATH "")
 
 ########################################################################
 # sphinx from spack
@@ -50,5 +50,3 @@ set(SPHINX_EXECUTABLE "/Users/harrison37/Work/blt_tutorial/tpls/spack/opt/spack/
 # doxygen from spack
 ########################################################################
 set(DOXYGEN_EXECUTABLE "/Users/harrison37/Work/blt_tutorial/tpls/spack/opt/spack/darwin-elcapitan-x86_64/clang-7.3.0-apple/doxygen-1.8.12-mji43fu4hxuu6js5irshpihkwwucn7rv/bin/doxygen" CACHE PATH "")
-
-

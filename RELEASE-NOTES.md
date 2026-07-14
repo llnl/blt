@@ -12,6 +12,8 @@ The project release numbers follow [Semantic Versioning](http://semver.org/spec/
 ### Changed
 - Modified `blt_add_sphinx_target` to allow setting sphinx source and configure directories.
 - Modified `blt_add_sphinx_target` and `blt_add_doxygen_target` requiring the first argument preceed with TARGET.
+- Updated CUDA support to use CMake's native CUDA language and `CUDAToolkit`/`CUDA::cudart`
+  targets instead of deprecated `FindCUDA`; removed Clang CUDA support.
 
 ## [Version 0.7.2] - Release date 2026-05-01
 

@@ -159,7 +159,19 @@ if(ENABLE_GTEST)
     #------------------------------------------------------
     # CUDA tests
     #------------------------------------------------------
-    if (ENABLE_CUDA AND CUDA_SEPARABLE_COMPILATION)
+    if (ENABLE_CUDA)
+        blt_add_executable(
+            NAME    t_cuda_runtime_compile
+            SOURCES src/t_cuda_runtime_compile.cpp
+            DEPENDS_ON blt::cuda_runtime)
+
+        blt_add_executable(
+            NAME    t_cuda_language_compile
+            SOURCES src/t_cuda_language_compile.cpp
+            DEPENDS_ON blt::cuda)
+    endif()
+
+    if (ENABLE_CUDA AND CMAKE_CUDA_SEPARABLE_COMPILATION)
         add_subdirectory(src/test_cuda_device_call_from_kernel)
     endif()
     
@@ -356,6 +368,8 @@ if(CLANGFORMAT_FOUND)
     src/object_library_test/object.hpp
 
     src/static_analysis/well_analyzed_source.cpp
+    src/t_cuda_language_compile.cpp
+    src/t_cuda_runtime_compile.cpp
     src/t_example_compile_definitions.cpp
     src/t_example_smoke.cpp
     src/t_header_only_smoke.cpp

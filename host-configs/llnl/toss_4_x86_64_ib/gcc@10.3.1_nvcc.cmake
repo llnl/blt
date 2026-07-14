@@ -48,12 +48,12 @@ set(MPIEXEC_NUMPROC_FLAG "-n" CACHE PATH "")
 #_blt_tutorial_cuda_config_start
 set(ENABLE_CUDA ON CACHE BOOL "")
 
-set(CUDA_TOOLKIT_ROOT_DIR "/usr/tce/packages/cuda/cuda-12.2.2" CACHE PATH "")
-set(CMAKE_CUDA_COMPILER "${CUDA_TOOLKIT_ROOT_DIR}/bin/nvcc" CACHE PATH "")
+set(CUDAToolkit_ROOT "/usr/tce/packages/cuda/cuda-12.2.2" CACHE PATH "")
+set(CMAKE_CUDA_COMPILER "${CUDAToolkit_ROOT}/bin/nvcc" CACHE PATH "")
 set(CMAKE_CUDA_HOST_COMPILER "${CMAKE_CXX_COMPILER}" CACHE PATH "")
 
 set(CMAKE_CUDA_ARCHITECTURES "70" CACHE STRING "")
 set(CMAKE_CUDA_FLAGS "-restrict --expt-extended-lambda -G" CACHE STRING "")
 
-set(CUDA_SEPARABLE_COMPILATION ON CACHE BOOL "" )
+set(CMAKE_CUDA_SEPARABLE_COMPILATION ON CACHE BOOL "" )
 #_blt_tutorial_cuda_config_end

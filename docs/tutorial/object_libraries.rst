@@ -32,10 +32,9 @@ the linker removing unused symbols in the larger library.
   if you need their inheritable information to be correct.
 
 If you are using separable CUDA compilation (relocatable device code) in your
-object library, users of that library will be required to use NVCC to link their
-executables - in general, only NVCC can perform the "device link" step.  To remove
-this restriction, you can enable the ``CUDA_RESOLVE_DEVICE_SYMBOLS`` property on
-an object library:
+object library, users of that library will need a final CUDA device link step.
+To perform that step while building the library, you can enable the
+``CUDA_RESOLVE_DEVICE_SYMBOLS`` property on an object library:
 
 .. code-block:: cmake
 
@@ -52,7 +51,8 @@ You can read more about this property in the
   These options only apply when an object library in your project is linked later
   into a shared or static library, in which case a separate object file containing
   device symbols is created and added to the "final" library.  Object libraries
-  provided directly to users of your project will still require a device link step.
+  provided directly to users of your project will still require a device link step
+  in the consuming target.
 
 The ``CUDA_RESOLVE_DEVICE_SYMBOLS`` property is also supported for static and shared libraries.
 By default, it is enabled for shared libraries but disabled for static libraries.
