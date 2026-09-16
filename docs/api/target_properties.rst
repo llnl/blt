@@ -128,9 +128,6 @@ or with the corresponding :ref:`blt_add_executable` and :ref:`blt_add_library` m
 ``PRIVATE`` flags are used for the given target. ``INTERFACE`` flags are inherited
 by any target that depends on this target. ``PUBLIC`` flags are both ``INTERFACE`` and ``PRIVATE``.
 
-If ``CUDA_LINK_WITH_NVCC`` is set to ``ON``, this macro will automatically
-convert ``-Wl,-rpath,`` to :literal:`-Xlinker -rpath -Xlinker\ `.
-
 .. note::
    This macro also handles the various changes that CMake made in 3.13.  For example,
    the target property ``LINK_FLAGS`` was changes to ``LINK_OPTIONS`` and was changed from a
@@ -144,8 +141,7 @@ convert ``-Wl,-rpath,`` to :literal:`-Xlinker -rpath -Xlinker\ `.
 
 .. note::
    In CMake versions 3.13 and above, this list is prepended with ``SHELL:`` which stops
-   CMake from de-duplicating flags.  This is especially bad when linking with NVCC when 
-   you have groups of flags like ``-Xlinker -rpath -Xlinker <directory>``.
+   CMake from de-duplicating grouped flags.
 
 
 .. _blt_print_target_properties:
@@ -255,4 +251,3 @@ of the generator or value of ``ENABLE_FOLDERS``).
 .. note::
   Do not use this macro on header-only, ``INTERFACE`` library targets, since 
   this will generate a CMake configuration error.
-

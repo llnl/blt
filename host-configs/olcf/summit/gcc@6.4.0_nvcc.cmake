@@ -47,12 +47,12 @@ set(MPIEXEC_EXECUTABLE "/sw/summit/xalt/1.2.1/bin/jsrun" CACHE PATH "")
 #------------------------------------------------------------------------------
 set(ENABLE_CUDA ON CACHE BOOL "")
 
-set(CUDA_TOOLKIT_ROOT_DIR "/sw/summit/cuda/10.1.243/" CACHE PATH "")
-set(CMAKE_CUDA_COMPILER "${CUDA_TOOLKIT_ROOT_DIR}/bin/nvcc" CACHE PATH "")
+set(CUDAToolkit_ROOT "/sw/summit/cuda/10.1.243/" CACHE PATH "")
+set(CMAKE_CUDA_COMPILER "${CUDAToolkit_ROOT}/bin/nvcc" CACHE PATH "")
 set(CMAKE_CUDA_HOST_COMPILER "${CMAKE_CXX_COMPILER}" CACHE PATH "")
 
 set(CMAKE_CUDA_ARCHITECTURES "70" CACHE STRING "")
 set(CMAKE_CUDA_FLAGS "-restrict --expt-extended-lambda -G"
     CACHE STRING "")
 
-set(CUDA_SEPARABLE_COMPILATION ON CACHE BOOL "")
+set(CMAKE_CUDA_SEPARABLE_COMPILATION ON CACHE BOOL "")

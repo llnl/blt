@@ -104,7 +104,11 @@ int main(int argc, char **argv)
 
   hwloc_topology_init(&topology); // Creates a hwloc topology
   // Gets the topology of the system, including attached devices
+  #if HWLOC_API_VERSION >= 0x00020000
+  hwloc_topology_set_io_types_filter(topology, HWLOC_TYPE_FILTER_KEEP_ALL);
+  #else
   hwloc_topology_set_flags(topology, HWLOC_TOPOLOGY_FLAG_WHOLE_IO);
+  #endif
   hwloc_topology_load(topology);
 
   int cuDevCount = 0;
@@ -261,8 +265,8 @@ int main(int argc, char **argv)
 
 
   // No CUDA streams, no party!
-  cudaStream_t cuStreams[cudaStreams];
-  cuChk(cudaStreamCreate(&cuStreams[rank]));
+  cudaStream_t cuStream;
+  cuChk(cudaStreamCreate(&cuStream));
 
   // This is needed for pinned memory access
   cuChk(cudaHostAlloc(&h_buf, bufsize * sizeof(float), cudaHostAllocPortable));
@@ -299,10 +303,10 @@ int main(int argc, char **argv)
     }
     cuChk(cudaMemcpy(d_buf, h_buf, bufsize*sizeof(float), cudaMemcpyHostToDevice));
     std::cout << "Rank " << rank << ": launching CUDA kernels ... ";
-    addOne<<<grid,block,0,cuStreams[rank]>>>(d_buf, bufsize);
+    addOne<<<grid,block,0,cuStream>>>(d_buf, bufsize);
     cudaError_t cuErr = cudaGetLastError();
     std::cout << cudaGetErrorString(cuErr) <<std::endl;
-    cuChk(cudaStreamSynchronize(cuStreams[rank]));
+    cuChk(cudaStreamSynchronize(cuStream));
     cuChk(cudaMemcpy(h_buf, d_buf, bufsize*sizeof(float), cudaMemcpyDeviceToHost));
 
     for (size_t i = 0; i < sbufsize; i++) // Sanity check
@@ -331,10 +335,10 @@ int main(int argc, char **argv)
 
     std::cout << "Rank " << rank << ": launching CUDA kernels ... ";
     cuChk(cudaMemcpy(d_buf, h_buf, bufsize * sizeof(float),cudaMemcpyHostToDevice));
-    addOne<<<grid,block,0,cuStreams[rank]>>>(d_buf, bufsize);
+    addOne<<<grid,block,0,cuStream>>>(d_buf, bufsize);
     cudaError_t cuErr = cudaGetLastError();
     std::cout << cudaGetErrorString(cuErr) <<std::endl;
-    cuChk(cudaStreamSynchronize(cuStreams[rank]));
+    cuChk(cudaStreamSynchronize(cuStream));
     cuChk(cudaMemcpy(h_buf, d_buf, bufsize * sizeof(float),
                      cudaMemcpyDeviceToHost));
   }
@@ -412,6 +416,7 @@ int main(int argc, char **argv)
 
   cuChk(cudaFree(d_buf));
   cuChk(cudaFreeHost(h_buf));
+  cuChk(cudaStreamDestroy(cuStream));
   if (rank == 0) { free(h_master); }
   MPI_Finalize();
   return 0;

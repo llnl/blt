@@ -95,8 +95,8 @@ CUDA
 Finally, ``test_3`` builds and tests the ``calc_pi_cuda`` library,
 which uses CUDA to parallelize the calculation over the integration intervals.
 
-To enable CUDA, we set ``ENABLE_CUDA``, ``CMAKE_CUDA_COMPILER``, 
-``CMAKE_CUDA_ARCHITECTURES``, and ``CUDA_TOOLKIT_ROOT_DIR`` in our host config file.
+To enable CUDA, we set ``ENABLE_CUDA``, ``CMAKE_CUDA_COMPILER``,
+``CMAKE_CUDA_ARCHITECTURES``, and ``CUDAToolkit_ROOT`` in our host config file.
 Also before enabling the CUDA language in CMake, you need to set 
 ``CMAKE_CUDA_HOST_COMPILER`` in CMake 3.9+ or ``CUDA_HOST_COMPILER`` in previous versions.
 If you do not call ``enable_language(CUDA)``, BLT will set the appropriate host
@@ -122,10 +122,10 @@ Here, you can see how ``calc_pi_cuda`` and ``test_3`` use ``DEPENDS_ON``:
 
 The ``blt::cuda`` dependency for ``calc_pi_cuda`` is a little special, 
 along with adding the normal CUDA library and headers to your library or executable,
-it also tells BLT that this target's C/C++/CUDA source files need to be compiled via
-``nvcc`` or ``cuda-clang``. If this is not a requirement, you can use the dependency
-``blt::cuda_runtime`` which also adds the CUDA runtime library and headers but will not
-compile each source file with ``nvcc``.
+it also tells BLT that this target's C/C++/CUDA source files need to be compiled as
+CUDA language sources. If this is not a requirement, you can use the dependency
+``blt::cuda_runtime`` which adds the CUDA runtime library and headers but will not
+change the language of your source files.
 
 .. note::
    If you are using GoogleTest and ``nvcc``, you will need to set 
