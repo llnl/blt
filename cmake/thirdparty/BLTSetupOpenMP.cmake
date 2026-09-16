@@ -23,7 +23,7 @@ set(_compile_flags ${OpenMP_CXX_FLAGS})
 set(_link_flags)
 set(_cuda_host_flag_prefix "")
 
-if(BLT_ENABLE_CUDA AND NOT BLT_ENABLE_CLANG_CUDA)
+if(BLT_ENABLE_CUDA AND "${CMAKE_CUDA_COMPILER}" MATCHES "nvcc")
     set(_cuda_host_flag_prefix "-Xcompiler=")
 endif()
 
