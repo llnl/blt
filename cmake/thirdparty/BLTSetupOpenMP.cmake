@@ -30,14 +30,27 @@ endif()
 
 if(NOT COMPILER_FAMILY_IS_MSVC)
     if(BLT_ENABLE_CUDA AND BLT_OPENMP_FLAGS_DIFFER)
-        set(_compile_flags
-            $<$<AND:$<NOT:$<COMPILE_LANGUAGE:CUDA>>,$<NOT:$<COMPILE_LANGUAGE:Fortran>>>:${OpenMP_CXX_FLAGS}> 
-            $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=${OpenMP_CXX_FLAGS}>
-            $<$<COMPILE_LANGUAGE:Fortran>:${OpenMP_Fortran_FLAGS}>)
+        if(BLT_ENABLE_CLANG_CUDA)
+            set(_compile_flags
+                $<$<AND:$<NOT:$<COMPILE_LANGUAGE:CUDA>>,$<NOT:$<COMPILE_LANGUAGE:Fortran>>>:${OpenMP_CXX_FLAGS}>
+                $<$<COMPILE_LANGUAGE:CUDA>:${OpenMP_CXX_FLAGS}>
+                $<$<COMPILE_LANGUAGE:Fortran>:${OpenMP_Fortran_FLAGS}>)
+        else()
+            set(_compile_flags
+                $<$<AND:$<NOT:$<COMPILE_LANGUAGE:CUDA>>,$<NOT:$<COMPILE_LANGUAGE:Fortran>>>:${OpenMP_CXX_FLAGS}>
+                $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=${OpenMP_CXX_FLAGS}>
+                $<$<COMPILE_LANGUAGE:Fortran>:${OpenMP_Fortran_FLAGS}>)
+        endif()
     elseif(BLT_ENABLE_CUDA)
-        set(_compile_flags
-            $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:${OpenMP_CXX_FLAGS}> 
-            $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=${OpenMP_CXX_FLAGS}>)
+        if(BLT_ENABLE_CLANG_CUDA)
+            set(_compile_flags
+                $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:${OpenMP_CXX_FLAGS}>
+                $<$<COMPILE_LANGUAGE:CUDA>:${OpenMP_CXX_FLAGS}>)
+        else()
+            set(_compile_flags
+                $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:${OpenMP_CXX_FLAGS}>
+                $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=${OpenMP_CXX_FLAGS}>)
+        endif()
     elseif(BLT_OPENMP_FLAGS_DIFFER)
         set(_compile_flags
             $<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:${OpenMP_CXX_FLAGS}>

@@ -57,6 +57,11 @@ else()
   message(STATUS "BLT HIP support is ${BLT_ENABLE_HIP}")
 endif()
 
+set(BLT_ENABLE_CLANG_CUDA FALSE)
+if(BLT_ENABLE_CUDA AND "${CMAKE_CUDA_COMPILER}" MATCHES "clang")
+  set(BLT_ENABLE_CLANG_CUDA TRUE)
+endif()
+
 # Detect if Fortran has been introduced.
 get_property(_languages GLOBAL PROPERTY ENABLED_LANGUAGES)
 if(_languages MATCHES "Fortran")
