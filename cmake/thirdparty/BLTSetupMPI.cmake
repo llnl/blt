@@ -51,9 +51,15 @@ if (BLT_ENABLE_FIND_MPI)
     #-------------------
     set(_c_flag ${MPI_C_${_mpi_compile_flags_suffix}})
     if (_c_flag AND BLT_ENABLE_CUDA)
-        list(APPEND _mpi_compile_flags
-                    $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:${_c_flag}>
-                    $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=${_c_flag}>)
+        if(BLT_ENABLE_CLANG_CUDA)
+            list(APPEND _mpi_compile_flags
+                        $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:${_c_flag}>
+                        $<$<COMPILE_LANGUAGE:CUDA>:${_c_flag}>)
+        else()
+            list(APPEND _mpi_compile_flags
+                        $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:${_c_flag}>
+                        $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=${_c_flag}>)
+        endif()
     else()
         list(APPEND _mpi_compile_flags ${_c_flag})
     endif()
@@ -61,9 +67,15 @@ if (BLT_ENABLE_FIND_MPI)
     set(_cxx_flag ${MPI_CXX_${_mpi_compile_flags_suffix}})
     if (_cxx_flag AND NOT "${_c_flag}" STREQUAL "${_cxx_flag}")
         if (BLT_ENABLE_CUDA)
-            list(APPEND _mpi_compile_flags
-            $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:${_cxx_flag}>
-            $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=${_cxx_flag}>)
+            if(BLT_ENABLE_CLANG_CUDA)
+                list(APPEND _mpi_compile_flags
+                $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:${_cxx_flag}>
+                $<$<COMPILE_LANGUAGE:CUDA>:${_cxx_flag}>)
+            else()
+                list(APPEND _mpi_compile_flags
+                $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:${_cxx_flag}>
+                $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=${_cxx_flag}>)
+            endif()
         else()
             list(APPEND _mpi_compile_flags ${_cxx_flag})
         endif()
