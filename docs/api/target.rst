@@ -354,7 +354,7 @@ blt_patch_target
                       DEFINES                  [def1 [def2 ...]] )
 
 Modifies the properties of an existing target.  ``PUBLIC`` visibility
-is used unless the target is an ``INTERFACE`` library, in which case
+is used unless the target is imported or an ``INTERFACE`` library, in which case
 ``INTERFACE`` visibility is used.
 
 NAME
