@@ -9,6 +9,9 @@ The project release numbers follow [Semantic Versioning](http://semver.org/spec/
 
 ## [Unreleased] - Release date yyyy-mm-dd
 
+### Fixed
+- Preserve consumer-added OpenMP target options when setting up BLT dependencies.
+
 ### Changed
 - Modified `blt_add_sphinx_target` to allow setting sphinx source and configure directories.
 - Modified `blt_add_sphinx_target` and `blt_add_doxygen_target` requiring the first argument preceed with TARGET.
