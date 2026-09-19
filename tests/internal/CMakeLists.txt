@@ -46,6 +46,22 @@ if(WIN32 AND BUILD_SHARED_LIBS)
     target_compile_definitions(example PUBLIC WIN32_SHARED_LIBS)
 endif()
 
+if(ENABLE_OPENMP)
+    foreach(_case initial existing partial)
+        add_test(NAME openmp_discovery_${_case}
+                 COMMAND ${CMAKE_COMMAND}
+                         -G "${CMAKE_GENERATOR}"
+                         -S "${CMAKE_CURRENT_SOURCE_DIR}/src/openmp_discovery_test"
+                         -B "${CMAKE_CURRENT_BINARY_DIR}/openmp_discovery_${_case}"
+                         "-DBLT_SOURCE_DIR=${BLT_SOURCE_DIR}"
+                         "-DDISCOVERY_CASE=${_case}"
+                         "-DENABLE_FORTRAN=${ENABLE_FORTRAN}"
+                         "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+                         "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                         "-DCMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}")
+    endforeach()
+endif()
+
 if(ENABLE_GTEST)
     #------------------------------------------------------
     # Add an executable
