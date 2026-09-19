@@ -8,7 +8,24 @@
 # (OpenMP support is provided by the compiler)
 #################################################
 
-find_package(OpenMP REQUIRED)
+# Rediscovering an existing OpenMP target overwrites consumer-added options.
+# Request only missing language components, including newly enabled languages.
+set(_blt_openmp_languages C CXX Fortran)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.31")
+    list(APPEND _blt_openmp_languages CUDA)
+endif()
+set(_blt_openmp_missing)
+foreach(_lang IN LISTS _blt_openmp_languages)
+    if(CMAKE_${_lang}_COMPILER_LOADED AND NOT TARGET OpenMP::OpenMP_${_lang})
+        list(APPEND _blt_openmp_missing ${_lang})
+    endif()
+endforeach()
+if(_blt_openmp_missing)
+    find_package(OpenMP REQUIRED COMPONENTS ${_blt_openmp_missing})
+endif()
+unset(_blt_openmp_languages)
+unset(_blt_openmp_missing)
+unset(_lang)
 
 # check if the openmp flags used for C/C++ are different from the openmp flags
 # used by the Fortran compiler
