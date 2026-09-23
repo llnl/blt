@@ -16,39 +16,13 @@
 # Build jobs
 matrix-clang_14.0.6:
   variables:
-    HOST_CONFIG: "clang@14.0.6.cmake"
+    HOST_CONFIG: "llvm@19.1.3_nvcc.cmake"
   extends: [.build_script, .on_matrix]
-
-
-# matrix-clang_10.0.1_nvcc_c++14_export_tpls:
-#   variables:
-#     HOST_CONFIG: "clang@10.0.1_nvcc_c++14_export_tpls.cmake"
-#   extends: [.build_script, .on_matrix]
-
-# matrix-clang_10.0.1_nvcc_c++14_xlf:
-#   variables:
-#     HOST_CONFIG: "clang@10.0.1_nvcc_c++14_xlf.cmake"
-#   extends: [.build_script, .on_matrix]
-
-# matrix-clang_10.0.1_nvcc_c++17:
-#   variables:
-#     HOST_CONFIG: "clang@10.0.1_nvcc_c++17.cmake"
-#   extends: [.build_script, .on_matrix]
-
-# matrix-clang_10.0.1_nvcc_c++17_no_separable:
-#   variables:
-#     HOST_CONFIG: "clang@10.0.1_nvcc_c++17_no_separable.cmake"
-#   extends: [.build_script, .on_matrix]
-
-# matrix-clang_14.0.5_with_gcc_8.3.1_nvcc_c++_only:
-#   variables:
-#     HOST_CONFIG: "clang@14.0.5_with_gcc@8.3.1_nvcc_c++_only.cmake"
-#   extends: [.build_script, .on_matrix]
 
 ####
 # CUDA project tests
-# matrix-clang_10.0.1_nvcc_cuda_clang_test:
-#   variables:
-#     ENABLED_BLT_TESTS: "cuda-arch cuda-mpi-cpp"
-#     HOST_CONFIG: "clang@10.0.1_nvcc_c++17.cmake"
-#   extends: [.run_project_integration_tests, .on_matrix]
+matrix-llvm_19.1.3_nvcc_cuda_clang_test:
+  variables:
+    ENABLED_BLT_TESTS: "cuda-arch cuda-mpi-cpp"
+    HOST_CONFIG: "llvm@19.1.3_nvcc.cmake"
+  extends: [.run_project_integration_tests, .on_matrix]
