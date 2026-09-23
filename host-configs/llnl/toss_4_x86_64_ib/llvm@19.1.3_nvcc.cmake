@@ -47,7 +47,9 @@ set(ENABLE_MPI ON CACHE BOOL "")
 # Cuda
 #------------------------------------------------
 
-set(CUDAToolkit_ROOT "/usr/tce/packages/cuda/cuda-12.9.1" CACHE PATH "")
+set(ENABLE_CUDA ON CACHE BOOL "")
+
+set(CUDAToolkit_ROOT "/usr/tce/packages/cuda/cuda-13.1.1" CACHE PATH "")
 
 set(CMAKE_CUDA_COMPILER "${CUDAToolkit_ROOT}/bin/nvcc" CACHE PATH "")
 
@@ -55,16 +57,11 @@ set(CMAKE_CUDA_HOST_COMPILER "${CMAKE_CXX_COMPILER}" CACHE PATH "")
 
 set(CMAKE_CUDA_ARCHITECTURES "90" CACHE STRING "")
 
-set(CMAKE_CUDA_FLAGS "" CACHE STRING "")
-
-set(ENABLE_CUDA ON CACHE BOOL "")
-
 set(CMAKE_CUDA_SEPARABLE_COMPILATION ON CACHE BOOL "")
 
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -restrict --expt-extended-lambda --expt-relaxed-constexpr -Xcompiler=-fPIC " CACHE STRING "" FORCE)
+set(CMAKE_CUDA_FLAGS "-Xcompiler=-fPIC" CACHE STRING "")
 
 # nvcc does not like gtest's 'pthreads' flag
-
 set(gtest_disable_pthreads ON CACHE BOOL "")
 
 #------------------------------------------------
