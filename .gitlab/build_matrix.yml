@@ -14,7 +14,7 @@
 
 ####
 # Build jobs
-matrix-clang_14.0.6:
+matrix-clang_19.1.3_nvcc:
   variables:
     HOST_CONFIG: "llvm@19.1.3_nvcc.cmake"
   extends: [.build_script, .on_matrix]
