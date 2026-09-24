@@ -87,53 +87,101 @@ macro(blt_inherit_target_info)
         message( FATAL_ERROR "Must provide a FROM argument to the 'blt_inherit_target' macro" )
     endif()
 
-    blt_determine_scope(TARGET ${arg_TO} OUT _scope)
+    # blt_find_target_dependencies is a macro and therefore shares this
+    # macro's scope. Preserve these arguments before its recursive call.
+    set(_blt_inherit_to ${arg_TO})
+    set(_blt_inherit_from ${arg_FROM})
+    set(_blt_inherit_object ${arg_OBJECT})
 
-    get_target_property(_interface_system_includes
-                        ${arg_FROM} INTERFACE_SYSTEM_INCLUDE_DIRECTORIES)
-    if ( _interface_system_includes )
-        target_include_directories(${arg_TO} SYSTEM ${_scope} ${_interface_system_includes})
+    blt_determine_scope(TARGET ${_blt_inherit_to} OUT _scope)
+
+    # Object libraries cannot use target_link_libraries() to propagate a
+    # dependency's usage requirements. Copy the compile-time requirements of
+    # each transitive CMake target instead.
+    set(_inherit_targets ${_blt_inherit_from})
+    if(_blt_inherit_object)
+        blt_find_target_dependencies(TARGET ${_blt_inherit_from}
+                                     TLIST _inherit_targets)
     endif()
 
-    get_target_property(_interface_includes
-                        ${arg_FROM} INTERFACE_INCLUDE_DIRECTORIES)
-    if ( _interface_includes )
-        target_include_directories(${arg_TO} ${_scope} ${_interface_includes})
-    endif()
-
-    get_target_property(_interface_defines
-                        ${arg_FROM} INTERFACE_COMPILE_DEFINITIONS)
-    if ( _interface_defines )
-        target_compile_definitions( ${arg_TO} ${_scope} ${_interface_defines})
-    endif()
-
-    if( ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13.0" )
-        get_target_property(_interface_link_options
-                            ${arg_FROM} INTERFACE_LINK_OPTIONS)
-        if ( _interface_link_options )
-            target_link_options( ${arg_TO} ${_scope} ${_interface_link_options})
+    foreach(_inherit_target IN LISTS _inherit_targets)
+        # Interface link libraries may include raw linker flags or library
+        # names, which have no target properties to inherit.
+        if(NOT TARGET ${_inherit_target})
+            continue()
         endif()
-    endif()
 
-    get_target_property(_interface_compile_options
-                        ${arg_FROM} INTERFACE_COMPILE_OPTIONS)
-    if ( _interface_compile_options )
-        target_compile_options( ${arg_TO} ${_scope} ${_interface_compile_options})
-    endif()
+        get_target_property(_interface_system_includes
+                            ${_inherit_target}
+                            INTERFACE_SYSTEM_INCLUDE_DIRECTORIES)
+        if(_interface_system_includes)
+            target_include_directories(${_blt_inherit_to} SYSTEM ${_scope}
+                                       ${_interface_system_includes})
+        endif()
 
-    if ( NOT arg_OBJECT )
+        get_target_property(_interface_includes
+                            ${_inherit_target}
+                            INTERFACE_INCLUDE_DIRECTORIES)
+        if(_interface_includes)
+            target_include_directories(${_blt_inherit_to} ${_scope}
+                                       ${_interface_includes})
+        endif()
+
+        get_target_property(_interface_defines
+                            ${_inherit_target}
+                            INTERFACE_COMPILE_DEFINITIONS)
+        if(_interface_defines)
+            target_compile_definitions(${_blt_inherit_to} ${_scope}
+                                       ${_interface_defines})
+        endif()
+
+        if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13.0")
+            get_target_property(_interface_link_options
+                                ${_inherit_target}
+                                INTERFACE_LINK_OPTIONS)
+            if(_interface_link_options)
+                target_link_options(${_blt_inherit_to} ${_scope}
+                                    ${_interface_link_options})
+            endif()
+        endif()
+
+        get_target_property(_interface_compile_options
+                            ${_inherit_target}
+                            INTERFACE_COMPILE_OPTIONS)
+        if(_interface_compile_options)
+            target_compile_options(${_blt_inherit_to} ${_scope}
+                                   ${_interface_compile_options})
+        endif()
+    endforeach()
+    unset(_inherit_target)
+    unset(_inherit_targets)
+    unset(_interface_system_includes)
+    unset(_interface_includes)
+    unset(_interface_defines)
+    unset(_interface_link_options)
+    unset(_interface_compile_options)
+
+    if(NOT _blt_inherit_object)
         get_target_property(_interface_link_directories
-                            ${arg_FROM} INTERFACE_LINK_DIRECTORIES)
+                            ${_blt_inherit_from}
+                            INTERFACE_LINK_DIRECTORIES)
         if ( _interface_link_directories )
-            target_link_directories( ${arg_TO} ${_scope} ${_interface_link_directories})
+            target_link_directories(${_blt_inherit_to} ${_scope}
+                                    ${_interface_link_directories})
         endif()
 
         get_target_property(_interface_link_libraries
-                            ${arg_FROM} INTERFACE_LINK_LIBRARIES)
+                            ${_blt_inherit_from}
+                            INTERFACE_LINK_LIBRARIES)
         if ( _interface_link_libraries )
-            target_link_libraries( ${arg_TO} ${_scope} ${_interface_link_libraries})
+            target_link_libraries(${_blt_inherit_to} ${_scope}
+                                  ${_interface_link_libraries})
         endif()
     endif()
+
+    unset(_blt_inherit_to)
+    unset(_blt_inherit_from)
+    unset(_blt_inherit_object)
 
 endmacro(blt_inherit_target_info)
 
