@@ -36,8 +36,7 @@ variables:
 
 # This is where jobs are included
 include:
-  # Disabled due to long job start times
-  # - local: .gitlab/build_matrix.yml
+  - local: .gitlab/build_matrix.yml
   - local: .gitlab/build_dane.yml
   - local: .gitlab/build_tioga.yml
   # ID token requirement for Gitlab 17.0+
