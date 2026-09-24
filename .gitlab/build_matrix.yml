@@ -10,6 +10,8 @@
     - if: '$CI_COMMIT_BRANCH =~ /_lnone/ || $ON_MATRIX == "OFF"' #run except if ...
       when: never
     - when: on_success
+  before_script:
+    - module load cmake/3.30.5
 
 
 ####
@@ -19,10 +21,21 @@ matrix-clang_19.1.3_nvcc:
     HOST_CONFIG: "llvm@19.1.3_nvcc.cmake"
   extends: [.build_script, .on_matrix]
 
+matrix-clang_22.1.5_clang_cuda:
+  variables:
+    HOST_CONFIG: "llvm@22.1.5_clang_cuda.cmake"
+  extends: [.build_script, .on_matrix]
+
 ####
 # CUDA project tests
-matrix-llvm_19.1.3_nvcc_cuda_clang_test:
+matrix-llvm_19.1.3_nvcc_test:
   variables:
     ENABLED_BLT_TESTS: "cuda-arch cuda-mpi-cpp"
     HOST_CONFIG: "llvm@19.1.3_nvcc.cmake"
+  extends: [.run_project_integration_tests, .on_matrix]
+
+matrix-llvm_22.1.5_clang_cuda_test:
+  variables:
+    ENABLED_BLT_TESTS: "cuda-arch cuda-mpi-cpp"
+    HOST_CONFIG: "llvm@22.1.5_clang_cuda.cmake"
   extends: [.run_project_integration_tests, .on_matrix]
