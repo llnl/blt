@@ -29,6 +29,7 @@ if ( NOT CMAKE_CUDA_HOST_COMPILER )
     endif()
 endif()
 
+# Backwards compatibility
 if(CUDA_TOOLKIT_ROOT_DIR AND NOT CUDAToolkit_ROOT)
     set(CUDAToolkit_ROOT "${CUDA_TOOLKIT_ROOT_DIR}" CACHE PATH
         "Root directory of the CUDA Toolkit" FORCE)
@@ -75,7 +76,6 @@ endif()
 message(STATUS "CUDA Include Path:              ${CUDAToolkit_INCLUDE_DIRS}")
 message(STATUS "CUDA Runtime Target:            CUDA::cudart")
 message(STATUS "CUDA Compile Flags:             ${CMAKE_CUDA_FLAGS}")
-message(STATUS "CUDA Link Flags:                ${CMAKE_CUDA_LINK_FLAGS}")
 message(STATUS "CUDA Separable Compilation:     ${CMAKE_CUDA_SEPARABLE_COMPILATION}")
 message(STATUS "CUDA Implicit Link Libraries:   ${CMAKE_CUDA_IMPLICIT_LINK_LIBRARIES}")
 message(STATUS "CUDA Implicit Link Directories: ${CMAKE_CUDA_IMPLICIT_LINK_DIRECTORIES}")
@@ -133,9 +133,28 @@ add_library(blt::cuda_runtime ALIAS cuda_runtime)
 # leaving it to the default source file language.
 # This logic is handled in the blt_add_library/executable
 # macros
+
+# Add lib directories if present since some CUDA installations don't
+set(_blt_cuda_lib_dir "")
+set(_blt_cuda_link_flags "")
+if(EXISTS "${CUDAToolkit_ROOT}/lib64")
+    set(_blt_cuda_lib_dir "${CUDAToolkit_ROOT}/lib64")
+elseif(EXISTS "${CUDAToolkit_ROOT}/lib")
+    set(_blt_cuda_lib_dir "${CUDAToolkit_ROOT}/lib")
+endif()
+
+if(_blt_cuda_lib_dir)
+    set(_blt_cuda_link_flags
+        "-L${_blt_cuda_lib_dir} -Xlinker -rpath -Xlinker ${_blt_cuda_lib_dir}")
+endif()
+
 blt_import_library(NAME          cuda
                    DEPENDS_ON    cuda_runtime
+                   LINK_FLAGS    ${_blt_cuda_link_flags}
                    EXPORTABLE    ${BLT_EXPORT_THIRDPARTY}
                    GLOBAL        ${_blt_cuda_is_global})
 
 add_library(blt::cuda ALIAS cuda)
+
+unset(_blt_cuda_lib_dir)
+unset(_blt_cuda_link_flags)

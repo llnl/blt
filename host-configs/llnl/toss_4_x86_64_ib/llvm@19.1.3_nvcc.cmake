@@ -61,9 +61,6 @@ set(CMAKE_CUDA_SEPARABLE_COMPILATION ON CACHE BOOL "")
 
 set(CMAKE_CUDA_FLAGS "-Xcompiler=-fPIC" CACHE STRING "")
 
-# This CUDA doesn't add it's lib diectory as a rpath
-set(BLT_EXE_LINKER_FLAGS "${BLT_EXE_LINKER_FLAGS} -Xlinker -rpath -Xlinker ${CUDAToolkit_ROOT}/lib64" CACHE STRING "Adds a missing libstdc++ rpath" FORCE)
-
 # nvcc does not like gtest's 'pthreads' flag
 set(gtest_disable_pthreads ON CACHE BOOL "")
 
