@@ -80,23 +80,41 @@ int main(int argc, char **argv)
 
   // Do not mess with the following lines unless you know what you are doing
   // --------------------------------------------------------------------------------------
+  const char* rankEnv = nullptr;
+  const char* localRankEnv = nullptr;
+
   #ifdef OPEN_MPI
-  rank       = atoi(std::getenv("OMPI_COMM_WORLD_RANK"));
-  local_rank = atoi(std::getenv("OMPI_COMM_WORLD_LOCAL_RANK"));
+  rankEnv = std::getenv("OMPI_COMM_WORLD_RANK");
+  localRankEnv = std::getenv("OMPI_COMM_WORLD_LOCAL_RANK");
   #endif
 
   #ifdef MPICH
-  rank       = atoi(std::getenv("MV2_COMM_WORLD_RANK"));
-  local_rank = atoi(std::getenv("MV2_COMM_WORLD_LOCAL_RANK"));
+  rankEnv = std::getenv("MV2_COMM_WORLD_RANK");
+  localRankEnv = std::getenv("MV2_COMM_WORLD_LOCAL_RANK");
   #endif
 
-  if (rank < 0 || local_rank < 0)
+  // Slurm launches MPI ranks directly and does not necessarily provide the
+  // environment variables normally set by mpirun/mpiexec.
+  if (rankEnv == nullptr)
   {
-    std::cout << "FATAL ERROR: MPI LIBRARY NOT SUPPORTED. EXITING ..." << std::endl;
-    std::cout << "This program only supports "
-              << "Open MPI, MPICH, MVAPICH2 and compatible" << std::endl;
+    rankEnv = std::getenv("SLURM_PROCID");
+  }
+  if (localRankEnv == nullptr)
+  {
+    localRankEnv = std::getenv("SLURM_LOCALID");
+  }
+
+  if (rankEnv == nullptr || localRankEnv == nullptr)
+  {
+    std::cout << "FATAL ERROR: MPI launcher rank information is unavailable."
+              << std::endl;
+    std::cout << "Launch with Open MPI, MVAPICH2/MPICH, or Slurm."
+              << std::endl;
     exit(-1);
   }
+
+  rank = atoi(rankEnv);
+  local_rank = atoi(localRankEnv);
 
   // --------------------------------------------------------------------------------------
 
@@ -132,6 +150,7 @@ int main(int argc, char **argv)
     cpu = ii;
     break;
   }
+  match++;
   // * NOTE: This is a preprocessor MACRO too, but needs a terminating semicolon. *
   hwloc_bitmap_foreach_end();
 
