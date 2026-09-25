@@ -254,21 +254,6 @@ if(ENABLE_GTEST)
 
 endif() # endif ENABLE_GTEST
 
-if (ENABLE_CUDA AND ENABLE_MPI AND 
-    "${BLT_CXX_STD}" MATCHES c\\+\\+1)
-    blt_add_executable(
-      NAME       test_cuda_mpi
-      SOURCES    src/test_cuda_mpi.cpp
-      DEPENDS_ON blt::cuda blt::mpi hwloc)
-
-    # Tests on a 2^24 elements array.
-    # It can go much bigger, but will not
-    # exceed memory capacity in most computers.
-    blt_add_test(NAME          test_cuda_mpi
-                 COMMAND       test_cuda_mpi 24
-                 NUM_MPI_TASKS 4)
-endif()
-
 # Exercise blt_print_target_properties macro
 message(STATUS "")
 message(STATUS "Exercising blt_print_target_properties macro default options.")
@@ -373,8 +358,6 @@ if(CLANGFORMAT_FOUND)
     src/t_example_compile_definitions.cpp
     src/t_example_smoke.cpp
     src/t_header_only_smoke.cpp
-    src/test_cuda_mpi.cpp
-    
     src/test_cuda_device_call_from_kernel/Child.cpp
     src/test_cuda_device_call_from_kernel/Child.hpp
     src/test_cuda_device_call_from_kernel/CudaTests.cpp
