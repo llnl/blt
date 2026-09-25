@@ -159,7 +159,19 @@ if(ENABLE_GTEST)
     #------------------------------------------------------
     # CUDA tests
     #------------------------------------------------------
-    if (ENABLE_CUDA AND CUDA_SEPARABLE_COMPILATION)
+    if (ENABLE_CUDA)
+        blt_add_executable(
+            NAME    t_cuda_runtime_compile
+            SOURCES src/t_cuda_runtime_compile.cpp
+            DEPENDS_ON blt::cuda_runtime)
+
+        blt_add_executable(
+            NAME    t_cuda_language_compile
+            SOURCES src/t_cuda_language_compile.cpp
+            DEPENDS_ON blt::cuda)
+    endif()
+
+    if (ENABLE_CUDA AND CMAKE_CUDA_SEPARABLE_COMPILATION)
         add_subdirectory(src/test_cuda_device_call_from_kernel)
     endif()
     
@@ -241,21 +253,6 @@ if(ENABLE_GTEST)
     endif()
 
 endif() # endif ENABLE_GTEST
-
-if (ENABLE_CUDA AND ENABLE_MPI AND 
-    "${BLT_CXX_STD}" MATCHES c\\+\\+1)
-    blt_add_executable(
-      NAME       test_cuda_mpi
-      SOURCES    src/test_cuda_mpi.cpp
-      DEPENDS_ON blt::cuda blt::mpi hwloc)
-
-    # Tests on a 2^24 elements array.
-    # It can go much bigger, but will not
-    # exceed memory capacity in most computers.
-    blt_add_test(NAME          test_cuda_mpi
-                 COMMAND       test_cuda_mpi 24
-                 NUM_MPI_TASKS 4)
-endif()
 
 # Exercise blt_print_target_properties macro
 message(STATUS "")
@@ -356,11 +353,11 @@ if(CLANGFORMAT_FOUND)
     src/object_library_test/object.hpp
 
     src/static_analysis/well_analyzed_source.cpp
+    src/t_cuda_language_compile.cpp
+    src/t_cuda_runtime_compile.cpp
     src/t_example_compile_definitions.cpp
     src/t_example_smoke.cpp
     src/t_header_only_smoke.cpp
-    src/test_cuda_mpi.cpp
-    
     src/test_cuda_device_call_from_kernel/Child.cpp
     src/test_cuda_device_call_from_kernel/Child.hpp
     src/test_cuda_device_call_from_kernel/CudaTests.cpp
