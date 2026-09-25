@@ -7,9 +7,9 @@
 # Sanity Checks
 ################################
 
-if( ${CMAKE_VERSION} VERSION_LESS "3.17.0" )
-  message(FATAL_ERROR "CUDA support requires CMake >= 3.17.0")
-endif ()
+if(CMAKE_VERSION VERSION_LESS "3.18.0")
+    message(FATAL_ERROR "CUDA support requires CMake >= 3.18.0")
+endif()
 
 # CMAKE_CUDA_HOST_COMPILER needs to be set prior to enabling the CUDA language
 get_property(_languages GLOBAL PROPERTY ENABLED_LANGUAGES)
