@@ -2,7 +2,7 @@
 # This is the shared configuration of jobs for matrix
 .on_matrix:
   variables:
-    SCHEDULER_PARAMETERS: "-p pci --exclusive=user --deadline=now+1hour -N1 -t 15"
+    SCHEDULER_PARAMETERS: "--partition=pci --deadline=now+3hour --gpus=1 -N1 -t 15"
   tags:
     - batch
     - matrix
