@@ -13,7 +13,15 @@ The project release numbers follow [Semantic Versioning](http://semver.org/spec/
 - Modified `blt_add_sphinx_target` to allow setting sphinx source and configure directories.
 - Modified `blt_add_sphinx_target` and `blt_add_doxygen_target` requiring the first argument preceed with TARGET.
 - Updated CUDA support to use CMake's native CUDA language and `CUDAToolkit`/`CUDA::cudart`
-  targets instead of deprecated `FindCUDA`; removed Clang CUDA support.
+  targets instead of deprecated `FindCUDA`.
+- Use `CUDAToolkit_ROOT` as the CUDA toolkit root variable. `CUDA_TOOLKIT_ROOT_DIR` is only read as a compatibility input and mapped to `CUDAToolkit_ROOT`.
+- Move separable compilation support to native CMake behavior via `CMAKE_CUDA_SEPARABLE_COMPILATION`. The old `CUDA_SEPARABLE_COMPILATION` variable is only mapped for compatibility.
+- Hardened CUDA smoke tests and tests against kernels not launching.
+
+### Removed
+- Remove ENABLE_CLANG_CUDA and BLT_CLANG_CUDA_ARCH
+- Remove legacy CUDA link-rule overrides that were needed for `FindCUDA`, including custom `CMAKE_CUDA_LINK_EXECUTABLE/`device-link rules and CUDA rpath flag overrides.
+- Remove several legacy CUDA variables: `CUDA_LINK_WITH_NVCC`, `CMAKE_CUDA_LINK_FLAGS`, `CUDA_LIBRARIES`, `CUDA_INCLUDE_DIRS`
 
 ## [Version 0.7.2] - Release date 2026-05-01
 
