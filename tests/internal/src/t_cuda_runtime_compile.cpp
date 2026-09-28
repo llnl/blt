@@ -5,13 +5,13 @@
 
 #include <cuda_runtime_api.h>
 
+#include "../../cuda_test_helpers.hpp"
+
 #ifdef __CUDACC__
 #error blt::cuda_runtime should not change C++ sources to CUDA language sources.
 #endif
 
 int main()
 {
-  int device_count = 0;
-  cudaError_t result = cudaGetDeviceCount(&device_count);
-  return result == cudaSuccess || result == cudaErrorNoDevice ? 0 : 1;
+  return blt::test::require_cuda_device("t_cuda_runtime_compile") ? 0 : 1;
 }

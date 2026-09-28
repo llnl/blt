@@ -19,11 +19,16 @@
 #include "cuda_runtime_api.h"
 #include <stdio.h>
 
+#include "../cuda_test_helpers.hpp"
+
 int main()
 {
-  int nDevices;
+  int nDevices = 0;
+  if (!blt::test::require_cuda_device("blt_cuda_runtime_smoke", &nDevices))
+  {
+    return 1;
+  }
 
-  cudaGetDeviceCount(&nDevices);
   for (int i = 0; i < nDevices; i++)
   {
     cudaDeviceProp prop;

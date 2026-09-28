@@ -18,6 +18,8 @@
 #include <omp.h>
 #include <stdio.h>
 
+#include "../cuda_test_helpers.hpp"
+
 __device__ const char *STR = "HELLO WORLD!";
 const char STR_LENGTH = 12;
 
@@ -28,6 +30,11 @@ __global__ void hello()
 
 int main()
 {
+  if (!blt::test::require_cuda_device("blt_cuda_openmp_smoke"))
+  {
+    return 1;
+  }
+
   // CUDA smoke test
   int num_threads = STR_LENGTH;
   int num_blocks = 1;
@@ -62,4 +69,3 @@ int main()
 
   return 0;
 }
-

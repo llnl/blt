@@ -7,6 +7,7 @@
 #include <new>
 #include "Parent.hpp"
 #include "Child.hpp"
+#include "../../../cuda_test_helpers.hpp"
 
 inline void gpuAssert(cudaError_t code, const char *file, int line,
                       bool abort=true)
@@ -32,6 +33,11 @@ __global__ void kernelApply(Parent** myGpuParent)
 
 int main(void)
 {
+  if (!blt::test::require_cuda_device("t_cuda_device_call_from_kernel"))
+  {
+    return 1;
+  }
+
   Child *c = new Child(0.0, 0.0, 0.0, 0.0);
   kernelApply<<<1, 1>>>(c->m_gpuParent);
   gpuAssert(cudaGetLastError(),__FILE__,__LINE__);

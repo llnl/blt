@@ -5,6 +5,8 @@
 
 #include <cuda_runtime_api.h>
 
+#include "../../cuda_test_helpers.hpp"
+
 #ifndef __CUDACC__
 #error blt::cuda should change C++ sources to CUDA language sources.
 #endif
@@ -16,11 +18,16 @@ __global__ void t_cuda_language_compile_kernel(int *value)
 
 int main()
 {
+  if (!blt::test::require_cuda_device("t_cuda_language_compile"))
+  {
+    return 1;
+  }
+
   int *value = nullptr;
   cudaError_t result = cudaMalloc(&value, sizeof(int));
   if (result != cudaSuccess)
   {
-    return result == cudaErrorNoDevice ? 0 : 1;
+    return 1;
   }
 
   t_cuda_language_compile_kernel<<<1, 1>>>(value);

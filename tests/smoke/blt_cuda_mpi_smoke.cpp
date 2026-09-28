@@ -14,6 +14,8 @@
 #include <mpi.h>
 #include <stdio.h>
 
+#include "../cuda_test_helpers.hpp"
+
 __global__ void hello(int rank) { printf("Hello from MPI rank %d\n", rank); }
 
 int main(int argc, char **argv) {
@@ -22,22 +24,28 @@ int main(int argc, char **argv) {
   int rank = -1;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  hello<<<1, 1>>>(rank);
-  cudaError_t status = cudaGetLastError();
-  if (status == cudaSuccess)
+  bool localSuccess = blt::test::require_cuda_device("blt_cuda_mpi_smoke");
+  if (localSuccess)
   {
-    status = cudaDeviceSynchronize();
+    hello<<<1, 1>>>(rank);
+    cudaError_t status = cudaGetLastError();
+    if (status == cudaSuccess)
+    {
+      status = cudaDeviceSynchronize();
+    }
+
+    localSuccess = status == cudaSuccess;
+    if (!localSuccess)
+    {
+      std::cerr << "MPI rank " << rank << ": " << cudaGetErrorString(status)
+                << std::endl;
+    }
   }
 
-  int localSuccess = status == cudaSuccess;
+  int localSuccessValue = localSuccess ? 1 : 0;
   int globalSuccess = 0;
-  MPI_Allreduce(&localSuccess, &globalSuccess, 1, MPI_INT, MPI_MIN,
+  MPI_Allreduce(&localSuccessValue, &globalSuccess, 1, MPI_INT, MPI_MIN,
                 MPI_COMM_WORLD);
-
-  if (!localSuccess) {
-    std::cerr << "MPI rank " << rank << ": " << cudaGetErrorString(status)
-              << std::endl;
-  }
 
   MPI_Finalize();
   return globalSuccess ? 0 : 1;

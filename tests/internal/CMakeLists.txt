@@ -308,6 +308,7 @@ add_subdirectory(unit)
 if(CLANGFORMAT_FOUND)
 
   set(smoke_tests_srcs
+    ../cuda_test_helpers.hpp
     ../smoke/blt_cuda_mpi_smoke.cpp
     ../smoke/blt_cuda_openmp_smoke.cpp
     ../smoke/blt_cuda_runtime_smoke.cpp

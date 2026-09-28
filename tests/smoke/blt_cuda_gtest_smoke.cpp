@@ -18,6 +18,7 @@
 #include <stdio.h>
 
 #include "gtest/gtest.h"
+#include "../cuda_test_helpers.hpp"
 
 __device__ const char *STR = "HELLO WORLD!";
 const char STR_LENGTH = 12;
@@ -37,4 +38,15 @@ TEST(blt_cuda_gtest_smoke,basic_assert_example)
   hello<<<num_blocks,num_threads>>>();
   ASSERT_EQ(cudaSuccess, cudaGetLastError());
   ASSERT_EQ(cudaSuccess, cudaDeviceSynchronize());
+}
+
+int main(int argc, char** argv)
+{
+  if (!blt::test::require_cuda_device("blt_cuda_gtest_smoke"))
+  {
+    return 1;
+  }
+
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
