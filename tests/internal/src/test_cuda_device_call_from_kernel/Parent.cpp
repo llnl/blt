@@ -6,7 +6,7 @@
 #include "Parent.hpp"
 #include <string.h>
 
-#if defined(__clang__)
+#if defined(__clang__) && !defined(__NVCC__)
 // Clang's CUDA runtime omits this device symbol, which is referenced by
 // Parent's pure-virtual device vtable.
 extern "C" __device__ void __cxa_pure_virtual()
