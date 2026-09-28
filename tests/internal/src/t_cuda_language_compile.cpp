@@ -45,15 +45,23 @@ int main()
   }
 
   result = cudaDeviceSynchronize();
-  cudaError_t free_result = cudaFree(value);
+  if (!blt::test::check_cuda_call(result,
+                                  "t_cuda_language_compile",
+                                  "cudaDeviceSynchronize"))
+  {
+    blt::test::check_cuda_call(cudaFree(value),
+                               "t_cuda_language_compile",
+                               "cudaFree after synchronization failure");
+    return 1;
+  }
 
-  const bool synchronize_success =
-    blt::test::check_cuda_call(result,
-                               "t_cuda_language_compile",
-                               "cudaDeviceSynchronize");
-  const bool free_success =
-    blt::test::check_cuda_call(free_result,
-                               "t_cuda_language_compile",
-                               "cudaFree");
-  return synchronize_success && free_success ? 0 : 1;
+  result = cudaFree(value);
+  if (!blt::test::check_cuda_call(result,
+                                  "t_cuda_language_compile",
+                                  "cudaFree"))
+  {
+    return 1;
+  }
+
+  return 0;
 }
