@@ -59,7 +59,9 @@ set(CMAKE_CUDA_ARCHITECTURES "90" CACHE STRING "")
 
 set(CMAKE_CUDA_SEPARABLE_COMPILATION ON CACHE BOOL "")
 
-set(CMAKE_CUDA_FLAGS "-fPIC --cuda-path=${CUDAToolkit_ROOT} -Wno-unknown-cuda-version" CACHE STRING "")
+# CMake's Clang-CUDA separable compilation support expects the legacy CUDA
+# fatbinary format and does not consume Clang 22's new offload output.
+set(CMAKE_CUDA_FLAGS "-fPIC --cuda-path=${CUDAToolkit_ROOT} -Wno-unknown-cuda-version --no-offload-new-driver" CACHE STRING "")
 
 #------------------------------------------------
 # OpenMP
