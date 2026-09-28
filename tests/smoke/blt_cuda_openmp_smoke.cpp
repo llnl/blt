@@ -40,16 +40,18 @@ int main()
   int num_blocks = 1;
   hello<<<num_blocks,num_threads>>>();
   cudaError_t result = cudaGetLastError();
-  if (result != cudaSuccess)
+  if (!blt::test::check_cuda_call(result,
+                                  "blt_cuda_openmp_smoke",
+                                  "hello kernel launch"))
   {
-    std::cerr << cudaGetErrorString(result) << std::endl;
     return 1;
   }
 
   result = cudaDeviceSynchronize();
-  if (result != cudaSuccess)
+  if (!blt::test::check_cuda_call(result,
+                                  "blt_cuda_openmp_smoke",
+                                  "cudaDeviceSynchronize"))
   {
-    std::cerr << cudaGetErrorString(result) << std::endl;
     return 1;
   }
 

@@ -25,21 +25,35 @@ int main()
 
   int *value = nullptr;
   cudaError_t result = cudaMalloc(&value, sizeof(int));
-  if (result != cudaSuccess)
+  if (!blt::test::check_cuda_call(result,
+                                  "t_cuda_language_compile",
+                                  "cudaMalloc"))
   {
     return 1;
   }
 
   t_cuda_language_compile_kernel<<<1, 1>>>(value);
   result = cudaGetLastError();
-  if (result != cudaSuccess)
+  if (!blt::test::check_cuda_call(result,
+                                  "t_cuda_language_compile",
+                                  "kernel launch"))
   {
-    cudaFree(value);
+    blt::test::check_cuda_call(cudaFree(value),
+                               "t_cuda_language_compile",
+                               "cudaFree after launch failure");
     return 1;
   }
 
   result = cudaDeviceSynchronize();
   cudaError_t free_result = cudaFree(value);
 
-  return result == cudaSuccess && free_result == cudaSuccess ? 0 : 1;
+  const bool synchronize_success =
+    blt::test::check_cuda_call(result,
+                               "t_cuda_language_compile",
+                               "cudaDeviceSynchronize");
+  const bool free_success =
+    blt::test::check_cuda_call(free_result,
+                               "t_cuda_language_compile",
+                               "cudaFree");
+  return synchronize_success && free_success ? 0 : 1;
 }

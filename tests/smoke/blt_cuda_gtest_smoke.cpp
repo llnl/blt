@@ -36,8 +36,12 @@ TEST(blt_cuda_gtest_smoke,basic_assert_example)
   int num_threads = STR_LENGTH;
   int num_blocks = 1;
   hello<<<num_blocks,num_threads>>>();
-  ASSERT_EQ(cudaSuccess, cudaGetLastError());
-  ASSERT_EQ(cudaSuccess, cudaDeviceSynchronize());
+  ASSERT_TRUE(blt::test::check_cuda_call(cudaGetLastError(),
+                                         "blt_cuda_gtest_smoke",
+                                         "hello kernel launch"));
+  ASSERT_TRUE(blt::test::check_cuda_call(cudaDeviceSynchronize(),
+                                         "blt_cuda_gtest_smoke",
+                                         "cudaDeviceSynchronize"));
 }
 
 int main(int argc, char** argv)

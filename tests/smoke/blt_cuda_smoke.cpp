@@ -38,12 +38,15 @@ int main()
   int num_blocks = 1;
   hello<<<num_blocks,num_threads>>>();
   cudaError_t result = cudaGetLastError();
-  if (result != cudaSuccess)
+  if (!blt::test::check_cuda_call(result,
+                                  "blt_cuda_smoke",
+                                  "hello kernel launch"))
   {
-    std::cerr << cudaGetErrorString(result) << std::endl;
     return 1;
   }
 
   result = cudaDeviceSynchronize();
-  return result == cudaSuccess ? 0 : 1;
+  return blt::test::check_cuda_call(result,
+                                    "blt_cuda_smoke",
+                                    "cudaDeviceSynchronize") ? 0 : 1;
 }

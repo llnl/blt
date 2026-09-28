@@ -3,24 +3,11 @@
 //
 // SPDX-License-Identifier: (BSD-3-Clause)
 
-#include <stdio.h>
 #include <new>
 #include "Parent.hpp"
 #include "Child.hpp"
 #include "../../../cuda_test_helpers.hpp"
 
-inline void gpuAssert(cudaError_t code, const char *file, int line,
-                      bool abort=true)
-{
-  if (code != cudaSuccess)
-  {
-    fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
-    if (abort)
-    {
-      exit(code);
-    }
-  }
-}
 __global__ void kernelApply(Parent** myGpuParent)
 {
   double *input = new double[4];
@@ -40,7 +27,17 @@ int main(void)
 
   Child *c = new Child(0.0, 0.0, 0.0, 0.0);
   kernelApply<<<1, 1>>>(c->m_gpuParent);
-  gpuAssert(cudaGetLastError(),__FILE__,__LINE__);
-  gpuAssert(cudaDeviceSynchronize(),__FILE__,__LINE__);
+  if (!blt::test::check_cuda_call(cudaGetLastError(),
+                                  "t_cuda_device_call_from_kernel",
+                                  "kernelApply launch"))
+  {
+    return 1;
+  }
+  if (!blt::test::check_cuda_call(cudaDeviceSynchronize(),
+                                  "t_cuda_device_call_from_kernel",
+                                  "cudaDeviceSynchronize"))
+  {
+    return 1;
+  }
   return 0;
 }

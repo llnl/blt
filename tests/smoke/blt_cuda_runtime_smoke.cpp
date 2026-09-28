@@ -33,10 +33,23 @@ int main()
   {
     cudaDeviceProp prop;
     int memoryClockRate;
-    cudaGetDeviceProperties(&prop, i);
+    if (!blt::test::check_cuda_call(cudaGetDeviceProperties(&prop, i),
+                                    "blt_cuda_runtime_smoke",
+                                    "cudaGetDeviceProperties"))
+    {
+      return 1;
+    }
 
 #if CUDART_VERSION >= 13000
-    cudaDeviceGetAttribute(&memoryClockRate, cudaDevAttrMemoryClockRate, i);
+    if (!blt::test::check_cuda_call(
+          cudaDeviceGetAttribute(&memoryClockRate,
+                                 cudaDevAttrMemoryClockRate,
+                                 i),
+          "blt_cuda_runtime_smoke",
+          "cudaDeviceGetAttribute(cudaDevAttrMemoryClockRate)"))
+    {
+      return 1;
+    }
 #else
     memoryClockRate = prop.memoryClockRate;
 #endif

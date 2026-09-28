@@ -13,6 +13,7 @@
 #include <iostream>
 #include <mpi.h>
 #include <stdio.h>
+#include <string>
 
 #include "../cuda_test_helpers.hpp"
 
@@ -24,21 +25,20 @@ int main(int argc, char **argv) {
   int rank = -1;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  bool localSuccess = blt::test::require_cuda_device("blt_cuda_mpi_smoke");
+  const std::string testName =
+    "blt_cuda_mpi_smoke rank " + std::to_string(rank);
+  bool localSuccess = blt::test::require_cuda_device(testName.c_str());
   if (localSuccess)
   {
     hello<<<1, 1>>>(rank);
-    cudaError_t status = cudaGetLastError();
-    if (status == cudaSuccess)
+    localSuccess = blt::test::check_cuda_call(cudaGetLastError(),
+                                               testName.c_str(),
+                                               "hello kernel launch");
+    if (localSuccess)
     {
-      status = cudaDeviceSynchronize();
-    }
-
-    localSuccess = status == cudaSuccess;
-    if (!localSuccess)
-    {
-      std::cerr << "MPI rank " << rank << ": " << cudaGetErrorString(status)
-                << std::endl;
+      localSuccess = blt::test::check_cuda_call(cudaDeviceSynchronize(),
+                                                 testName.c_str(),
+                                                 "cudaDeviceSynchronize");
     }
   }
 

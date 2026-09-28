@@ -4,8 +4,10 @@
 // SPDX-License-Identifier: (BSD-3-Clause)
 
 #include <math.h>
+#include <cstdlib>
 #include <new>
 #include "Child.hpp"
+#include "../../../cuda_test_helpers.hpp"
 
 __global__ void kernelCreateChild(Parent **myGpuParent, 
                                   double a, double b,
@@ -22,10 +24,26 @@ __host__ __device__ Child::Child(double a, double b, double c, double d)
   , m_d(d)
 {
   #ifndef __CUDA_ARCH__
-  cudaMalloc(&(m_gpuParent), sizeof(Parent **));
+  if (!blt::test::check_cuda_call(cudaMalloc(&(m_gpuParent), sizeof(Parent **)),
+                                  "t_cuda_device_call_from_kernel",
+                                  "cudaMalloc"))
+  {
+    std::exit(EXIT_FAILURE);
+  }
 
   kernelCreateChild<<<1,1>>>(m_gpuParent, a, b, c, d);
-  cudaDeviceSynchronize();
+  if (!blt::test::check_cuda_call(cudaGetLastError(),
+                                  "t_cuda_device_call_from_kernel",
+                                  "kernelCreateChild launch"))
+  {
+    std::exit(EXIT_FAILURE);
+  }
+  if (!blt::test::check_cuda_call(cudaDeviceSynchronize(),
+                                  "t_cuda_device_call_from_kernel",
+                                  "kernelCreateChild cudaDeviceSynchronize"))
+  {
+    std::exit(EXIT_FAILURE);
+  }
   #endif
 }
 

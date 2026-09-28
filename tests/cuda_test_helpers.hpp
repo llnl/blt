@@ -15,6 +15,21 @@ namespace blt
 namespace test
 {
 
+inline bool check_cuda_call(cudaError_t result,
+                            const char* test_name,
+                            const char* operation)
+{
+  if (result == cudaSuccess)
+  {
+    return true;
+  }
+
+  std::cerr << "ERROR: " << test_name << ": " << operation << " failed with "
+            << cudaGetErrorName(result) << " (" << static_cast<int>(result)
+            << "): " << cudaGetErrorString(result) << std::endl;
+  return false;
+}
+
 inline bool require_cuda_device(const char* test_name,
                                 int* device_count_out = nullptr)
 {
@@ -35,11 +50,8 @@ inline bool require_cuda_device(const char* test_name,
 
   if (result != cudaSuccess)
   {
-    std::cerr << "ERROR: " << test_name
-              << " requires an accessible CUDA device, but cudaGetDeviceCount "
-                 "failed: "
-              << cudaGetErrorString(result)
-              << ". Verify the GPU allocation, CUDA driver, and "
+    check_cuda_call(result, test_name, "cudaGetDeviceCount");
+    std::cerr << "Verify the GPU allocation, CUDA driver, and "
                  "CUDA_VISIBLE_DEVICES."
               << std::endl;
     return false;

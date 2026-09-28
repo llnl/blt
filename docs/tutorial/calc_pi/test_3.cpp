@@ -36,8 +36,9 @@ bool require_cuda_device()
 
     if (result != cudaSuccess)
     {
-        std::cerr << "ERROR: test_3 requires an accessible CUDA device, but "
-                     "cudaGetDeviceCount failed: "
+        std::cerr << "ERROR: test_3: cudaGetDeviceCount failed with "
+                  << cudaGetErrorName(result) << " ("
+                  << static_cast<int>(result) << "): "
                   << cudaGetErrorString(result)
                   << ". Verify the GPU allocation, CUDA driver, and "
                      "CUDA_VISIBLE_DEVICES."
