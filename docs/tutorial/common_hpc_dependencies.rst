@@ -97,10 +97,9 @@ which uses CUDA to parallelize the calculation over the integration intervals.
 
 To enable CUDA, we set ``ENABLE_CUDA``, ``CMAKE_CUDA_COMPILER``,
 ``CMAKE_CUDA_ARCHITECTURES``, and ``CUDAToolkit_ROOT`` in our host config file.
-Also before enabling the CUDA language in CMake, you need to set 
-``CMAKE_CUDA_HOST_COMPILER`` in CMake 3.9+ or ``CUDA_HOST_COMPILER`` in previous versions.
-If you do not call ``enable_language(CUDA)``, BLT will set the appropriate host
-compiler variable for you and enable the CUDA language.
+It is important to do this before calling `enable_langauge(CUDA)`. If you do not call
+``enable_language(CUDA)``, BLT will set the appropriate host compiler variable for you
+and enable the CUDA language.
 
 .. note::
    The ``BLT_CXX_STD`` variable is useful to set the C++ and CUDA language standard to the
