@@ -34,6 +34,7 @@ int main(void)
 {
   Child *c = new Child(0.0, 0.0, 0.0, 0.0);
   kernelApply<<<1, 1>>>(c->m_gpuParent);
+  gpuAssert(cudaGetLastError(),__FILE__,__LINE__);
   gpuAssert(cudaDeviceSynchronize(),__FILE__,__LINE__);
   return 0;
 }

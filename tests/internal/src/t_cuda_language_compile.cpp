@@ -24,6 +24,13 @@ int main()
   }
 
   t_cuda_language_compile_kernel<<<1, 1>>>(value);
+  result = cudaGetLastError();
+  if (result != cudaSuccess)
+  {
+    cudaFree(value);
+    return 1;
+  }
+
   result = cudaDeviceSynchronize();
   cudaFree(value);
 

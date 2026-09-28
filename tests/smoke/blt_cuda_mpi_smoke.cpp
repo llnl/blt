@@ -23,7 +23,11 @@ int main(int argc, char **argv) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   hello<<<1, 1>>>(rank);
-  cudaError_t status = cudaDeviceSynchronize();
+  cudaError_t status = cudaGetLastError();
+  if (status == cudaSuccess)
+  {
+    status = cudaDeviceSynchronize();
+  }
 
   int localSuccess = status == cudaSuccess;
   int globalSuccess = 0;

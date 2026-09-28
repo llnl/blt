@@ -30,9 +30,14 @@ int main()
   int num_threads = STR_LENGTH;
   int num_blocks = 1;
   hello<<<num_blocks,num_threads>>>();
-  cudaDeviceSynchronize();
+  cudaError_t result = cudaGetLastError();
+  if (result != cudaSuccess)
+  {
+    std::cerr << cudaGetErrorString(result) << std::endl;
+    return 1;
+  }
 
-  return 0;
+  result = cudaDeviceSynchronize();
+  return result == cudaSuccess ? 0 : 1;
 }
-
 

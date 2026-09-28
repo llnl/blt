@@ -32,7 +32,19 @@ int main()
   int num_threads = STR_LENGTH;
   int num_blocks = 1;
   hello<<<num_blocks,num_threads>>>();
-  cudaDeviceSynchronize();
+  cudaError_t result = cudaGetLastError();
+  if (result != cudaSuccess)
+  {
+    std::cerr << cudaGetErrorString(result) << std::endl;
+    return 1;
+  }
+
+  result = cudaDeviceSynchronize();
+  if (result != cudaSuccess)
+  {
+    std::cerr << cudaGetErrorString(result) << std::endl;
+    return 1;
+  }
 
   // OpenMP smoke test
   #pragma omp parallel
@@ -50,5 +62,4 @@ int main()
 
   return 0;
 }
-
 

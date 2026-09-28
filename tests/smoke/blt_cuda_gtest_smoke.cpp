@@ -35,6 +35,6 @@ TEST(blt_cuda_gtest_smoke,basic_assert_example)
   int num_threads = STR_LENGTH;
   int num_blocks = 1;
   hello<<<num_blocks,num_threads>>>();
-  cudaDeviceSynchronize();
-  EXPECT_TRUE( true );
+  ASSERT_EQ(cudaSuccess, cudaGetLastError());
+  ASSERT_EQ(cudaSuccess, cudaDeviceSynchronize());
 }
