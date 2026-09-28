@@ -32,7 +32,7 @@ int main()
   }
 
   result = cudaDeviceSynchronize();
-  cudaFree(value);
+  cudaError_t free_result = cudaFree(value);
 
-  return result == cudaSuccess ? 0 : 1;
+  return result == cudaSuccess && free_result == cudaSuccess ? 0 : 1;
 }
