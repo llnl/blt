@@ -21,7 +21,7 @@ The project release numbers follow [Semantic Versioning](http://semver.org/spec/
 ### Removed
 - Remove ENABLE_CLANG_CUDA and BLT_CLANG_CUDA_ARCH
 - Remove legacy CUDA link-rule overrides that were needed for `FindCUDA`, including custom `CMAKE_CUDA_LINK_EXECUTABLE/`device-link rules and CUDA rpath flag overrides.
-- Remove several legacy CUDA variables: `CUDA_LINK_WITH_NVCC`, `CMAKE_CUDA_LINK_FLAGS`, `CUDA_LIBRARIES`, `CUDA_INCLUDE_DIRS`
+- Remove several legacy CUDA variables: `CUDA_LINK_WITH_NVCC` and `CMAKE_CUDA_LINK_FLAGS`
 
 ## [Version 0.7.2] - Release date 2026-05-01
 
