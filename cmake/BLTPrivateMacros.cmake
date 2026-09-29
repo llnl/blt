@@ -440,7 +440,7 @@ macro(blt_setup_hip_early_rdc_target)
     if(NOT DEFINED arg_NAME)
         message(FATAL_ERROR "blt_setup_hip_early_rdc_target requires NAME")
     endif()
-    if(NOT DEFINED arg_RDC_SOURCES AND NOT DEFINED FULL_RDC AND NOT FULL_RDC)
+    if(NOT DEFINED arg_RDC_SOURCES AND NOT arg_FULL_RDC)
         message(FATAL_ERROR "blt_setup_hip_early_rdc_target requires RDC_SOURCES unless FULL_RDC is set to TRUE")
     endif()
 
