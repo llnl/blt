@@ -155,3 +155,4 @@ add_library(blt::cuda ALIAS cuda)
 
 unset(_blt_cuda_lib_dir)
 unset(_blt_cuda_link_flags)
+unset(_blt_cuda_is_global)
