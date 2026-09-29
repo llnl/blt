@@ -407,7 +407,8 @@ endmacro(blt_setup_hip_target)
 ##                                HEADERS     <headers associated with RDC_SOURCES>
 ##                                SUFFIX      <suffix for generated targets; default: BLT_EARLY_RDC_SUFFIX or "_earlyrdc">
 ##                                OBJECT      <TRUE if NAME is an OBJECT library, otherwise FALSE>
-##                                FULL_RDC    <TRUE when all HIP sources in NAME require RDC; RDC_SOURCES/HEADERS are ignored>)
+##                                FULL_RDC    <TRUE when all HIP sources in NAME require RDC; RDC_SOURCES/HEADERS are ignored>
+##                                EXTRA_ARCHIVES <extra archives added to the erdc.sh command line>)
 ##
 ## When FULL_RDC is FALSE (default):
 ##   - Creates a static host RDC library <NAME><SUFFIX>_host from RDC_SOURCES (+HEADERS),
@@ -433,7 +434,7 @@ macro(blt_setup_hip_early_rdc_target)
 
     set(options)
     set(singleValueArgs NAME SUFFIX OBJECT INTERFACE FULL_RDC)
-    set(multiValueArgs RDC_SOURCES DEPENDS_ON INCLUDES HEADERS)
+    set(multiValueArgs RDC_SOURCES DEPENDS_ON INCLUDES HEADERS EXTRA_ARCHIVES)
 
     cmake_parse_arguments(arg "${options}" "${singleValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -555,7 +556,7 @@ macro(blt_setup_hip_early_rdc_target)
         list(REMOVE_ITEM _erdc_extra_input_targets ${arg_NAME})
     endif()
 
-    set(_erdc_extra_inputs)
+    set(_erdc_extra_inputs ${arg_EXTRA_ARCHIVES})
     foreach(_tgt ${_erdc_extra_input_targets})
         list(APPEND _erdc_extra_inputs "$<TARGET_FILE:${_tgt}>")
     endforeach()
