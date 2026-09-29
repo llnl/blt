@@ -14,15 +14,15 @@ endif()
 # CMAKE_CUDA_HOST_COMPILER needs to be set prior to enabling the CUDA language
 get_property(_languages GLOBAL PROPERTY ENABLED_LANGUAGES)
 
-if ( NOT CMAKE_CUDA_HOST_COMPILER )
-    if("CUDA" IN_LIST _languages )
+if(NOT CMAKE_CUDA_HOST_COMPILER)
+    if("CUDA" IN_LIST _languages)
         message( FATAL_ERROR
                  "CUDA language enabled prior to setting CMAKE_CUDA_HOST_COMPILER. "
                  "Please set CMAKE_CUDA_HOST_COMPILER prior to "
                  "ENABLE_LANGUAGE(CUDA) or PROJECT(.. LANGUAGES CUDA)")
     endif()
 
-    if ( CMAKE_CXX_COMPILER )
+    if(CMAKE_CXX_COMPILER)
         set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER} CACHE STRING "" FORCE)
     else()
         set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_C_COMPILER} CACHE STRING "" FORCE)
@@ -95,15 +95,15 @@ endif()
 # Set PIE options to empty for PGI since it doesn't understand -fPIE This
 # option is set in the CUDA toolchain file so must be unset after
 # enable_language(CUDA)
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "PGI")
   set(CMAKE_CUDA_COMPILE_OPTIONS_PIE "")
 endif()
 
 
 # CUDA targets must be global for aliases when created as imported targets.
-set(_blt_cuda_is_global On)
-if(${BLT_EXPORT_THIRDPARTY})
-    set(_blt_cuda_is_global Off)
+set(_blt_cuda_is_global ON)
+if(BLT_EXPORT_THIRDPARTY)
+    set(_blt_cuda_is_global OFF)
 endif()
 
 # Use DEPENDS_ON to keep the CUDA::cudart imported library target in the link
