@@ -401,13 +401,13 @@ endmacro(blt_setup_hip_target)
 
 ##------------------------------------------------------------------------------
 ## blt_setup_hip_early_rdc_target(NAME        <base target name>
-##                                 RDC_SOURCES <HIP sources requiring RDC>
-##                                 DEPENDS_ON  <dependency list for HIP build>
-##                                 INCLUDES    <include directories for HIP build>
-##                                 HEADERS     <headers associated with RDC_SOURCES>
-##                                 SUFFIX      <suffix for generated targets; default: BLT_EARLY_RDC_SUFFIX or "_earlyrdc">
-##                                 OBJECT      <TRUE if NAME is an OBJECT library, otherwise FALSE>
-##                                 FULL_RDC    <TRUE when all HIP sources in NAME require RDC; RDC_SOURCES/HEADERS are ignored>)
+##                                RDC_SOURCES <HIP sources requiring RDC>
+##                                DEPENDS_ON  <dependency list for HIP build>
+##                                INCLUDES    <include directories for HIP build>
+##                                HEADERS     <headers associated with RDC_SOURCES>
+##                                SUFFIX      <suffix for generated targets; default: BLT_EARLY_RDC_SUFFIX or "_earlyrdc">
+##                                OBJECT      <TRUE if NAME is an OBJECT library, otherwise FALSE>
+##                                FULL_RDC    <TRUE when all HIP sources in NAME require RDC; RDC_SOURCES/HEADERS are ignored>)
 ##
 ## When FULL_RDC is FALSE (default):
 ##   - Creates a static host RDC library <NAME><SUFFIX>_host from RDC_SOURCES (+HEADERS),
