@@ -146,7 +146,7 @@ endmacro(blt_register_library)
 ##                  RDC          [TRUE | FALSE]           (HIP-only)
 ##                  RDC_SOURCES  [src1 [src2 ...]]        (HIP-only)
 ##                  EARLY_RDC    [TRUE | FALSE]           (HIP-only)
-##                  EARLY_RDC_SUFFIX  [suffix]            (default: "_earlyrdc"))
+##                  EARLY_RDC_SUFFIX  [suffix]            (default: ""))
 ##
 ## Adds a library target, called <libname>, to be built from the given sources.
 ##
@@ -220,7 +220,7 @@ macro(blt_add_library)
         if(DEFINED BLT_EARLY_RDC_SUFFIX)
             set(arg_EARLY_RDC_SUFFIX "${BLT_EARLY_RDC_SUFFIX}")
         else()
-            set(arg_EARLY_RDC_SUFFIX "_earlyrdc")
+            set(arg_EARLY_RDC_SUFFIX "")
         endif()
     endif()
 
@@ -537,7 +537,7 @@ endmacro(blt_add_library)
 ##                     RDC         [TRUE | FALSE]           (HIP-only)
 ##                     RDC_SOURCES [src1 [src2 ...]]        (HIP-only)
 ##                     EARLY_RDC   [TRUE | FALSE]           (HIP-only)
-##                     EARLY_RDC_SUFFIX  [suffix]           (default: "_earlyrdc"))
+##                     EARLY_RDC_SUFFIX  [suffix]           (default: ""))
 ##
 ## Adds an executable target, called <name>, to be built from the given sources.
 ##
@@ -583,7 +583,7 @@ macro(blt_add_executable)
         if(DEFINED BLT_EARLY_RDC_SUFFIX)
             set(arg_EARLY_RDC_SUFFIX "${BLT_EARLY_RDC_SUFFIX}")
         else()
-            set(arg_EARLY_RDC_SUFFIX "_earlyrdc")
+            set(arg_EARLY_RDC_SUFFIX "")
         endif()
     endif()
 

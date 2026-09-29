@@ -405,7 +405,7 @@ endmacro(blt_setup_hip_target)
 ##                                DEPENDS_ON  <dependency list for HIP build>
 ##                                INCLUDES    <include directories for HIP build>
 ##                                HEADERS     <headers associated with RDC_SOURCES>
-##                                SUFFIX      <suffix for generated targets; default: BLT_EARLY_RDC_SUFFIX or "_earlyrdc">
+##                                SUFFIX      <suffix for generated targets; default: BLT_EARLY_RDC_SUFFIX or "">
 ##                                OBJECT      <TRUE if NAME is an OBJECT library, otherwise FALSE>
 ##                                FULL_RDC    <TRUE when all HIP sources in NAME require RDC; RDC_SOURCES/HEADERS are ignored>
 ##                                EXTRA_ARCHIVES <extra archives added to the erdc.sh command line>)
@@ -484,7 +484,7 @@ macro(blt_setup_hip_early_rdc_target)
         if(DEFINED BLT_EARLY_RDC_SUFFIX)
             set(arg_SUFFIX "${BLT_EARLY_RDC_SUFFIX}")
         else()
-            set(arg_SUFFIX "_earlyrdc")
+            set(arg_SUFFIX "")
         endif()
     endif()
     message(STATUS "[BLT] Configuring HIP early RDC for '${arg_NAME}' with suffix '${arg_SUFFIX}'")
