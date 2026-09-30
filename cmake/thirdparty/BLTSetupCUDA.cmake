@@ -106,22 +106,6 @@ if(BLT_EXPORT_THIRDPARTY)
     set(_blt_cuda_is_global OFF)
 endif()
 
-# Use DEPENDS_ON to keep the CUDA::cudart imported library target in the link
-# interface. blt_inherit_target_info() only copies interface usage properties.
-
-# Depend on blt::cuda_runtime to use the CUDA runtime while compiling source
-# files with their regular C/CXX compiler rather than the CUDA compiler (nvcc).
-# The blt_add_library() and blt_add_executable() macros will _not_ flag sources
-# as CUDA.
-blt_import_library(NAME          cuda_runtime
-                   INCLUDES      ${CUDAToolkit_INCLUDE_DIRS}
-                   TREAT_INCLUDES_AS_SYSTEM ON
-                   DEPENDS_ON    CUDA::cudart
-                   EXPORTABLE    ${BLT_EXPORT_THIRDPARTY}
-                   GLOBAL        ${_blt_cuda_is_global})
-
-add_library(blt::cuda_runtime ALIAS cuda_runtime)
-
 # Add lib directories if present since some CUDA installations don't
 set(_blt_cuda_lib_dir "")
 set(_blt_cuda_link_flags "")
@@ -136,12 +120,28 @@ if(_blt_cuda_lib_dir)
         "-L${_blt_cuda_lib_dir} -Xlinker -rpath -Xlinker ${_blt_cuda_lib_dir}")
 endif()
 
+# Use DEPENDS_ON to keep the CUDA::cudart imported library target in the link
+# interface. blt_inherit_target_info() only copies interface usage properties.
+
+# Depend on blt::cuda_runtime to use the CUDA runtime while compiling source
+# files with their regular C/CXX compiler rather than the CUDA compiler (nvcc).
+# The blt_add_library() and blt_add_executable() macros will _not_ flag sources
+# as CUDA.
+blt_import_library(NAME          cuda_runtime
+                   INCLUDES      ${CUDAToolkit_INCLUDE_DIRS}
+                   LINK_FLAGS    ${_blt_cuda_link_flags}
+                   TREAT_INCLUDES_AS_SYSTEM ON
+                   DEPENDS_ON    CUDA::cudart
+                   EXPORTABLE    ${BLT_EXPORT_THIRDPARTY}
+                   GLOBAL        ${_blt_cuda_is_global})
+
+add_library(blt::cuda_runtime ALIAS cuda_runtime)
+
 # Depend on blt::cuda to use CUDA headers and libraries and to compile source
 # files with the CUDA compiler (nvcc) rather than their regular C/CXX compiler.
 # The blt_add_library() and blt_add_executable() macros _will_ flag soucres as CUDA.
 blt_import_library(NAME          cuda
                    DEPENDS_ON    cuda_runtime
-                   LINK_FLAGS    ${_blt_cuda_link_flags}
                    EXPORTABLE    ${BLT_EXPORT_THIRDPARTY}
                    GLOBAL        ${_blt_cuda_is_global})
 
