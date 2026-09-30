@@ -18,6 +18,8 @@
 #include <omp.h>
 #include <stdio.h>
 
+#include "../cuda_test_helpers.hpp"
+
 __device__ const char *STR = "HELLO WORLD!";
 const char STR_LENGTH = 12;
 
@@ -28,11 +30,30 @@ __global__ void hello()
 
 int main()
 {
+  if (!blt::test::require_cuda_device("blt_cuda_openmp_smoke"))
+  {
+    return 1;
+  }
+
   // CUDA smoke test
   int num_threads = STR_LENGTH;
   int num_blocks = 1;
   hello<<<num_blocks,num_threads>>>();
-  cudaDeviceSynchronize();
+  cudaError_t result = cudaGetLastError();
+  if (!blt::test::check_cuda_call(result,
+                                  "blt_cuda_openmp_smoke",
+                                  "hello kernel launch"))
+  {
+    return 1;
+  }
+
+  result = cudaDeviceSynchronize();
+  if (!blt::test::check_cuda_call(result,
+                                  "blt_cuda_openmp_smoke",
+                                  "cudaDeviceSynchronize"))
+  {
+    return 1;
+  }
 
   // OpenMP smoke test
   #pragma omp parallel
@@ -50,5 +71,3 @@ int main()
 
   return 0;
 }
-
-

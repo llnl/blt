@@ -16,9 +16,8 @@
 # gcc@10.3.1 compilers
 #------------------------------------------------------------------------------
 
-# _blt_pascal_compiler_config_start
 set(GCC_VERSION "gcc-10.3.1")
-set(GCC_HOME "/usr/tce/packages/gcc/${GCC_VERSION}")
+set(GCC_HOME "/usr/tce")
 
 set(CMAKE_C_COMPILER "${GCC_HOME}/bin/gcc" CACHE PATH "")
 set(CMAKE_CXX_COMPILER "${GCC_HOME}/bin/g++" CACHE PATH "")
@@ -26,7 +25,6 @@ set(CMAKE_CXX_COMPILER "${GCC_HOME}/bin/g++" CACHE PATH "")
 # Fortran support
 set(ENABLE_FORTRAN ON CACHE BOOL "")
 set(CMAKE_Fortran_COMPILER "${GCC_HOME}/bin/gfortran" CACHE PATH "")
-# _blt_pascal_compiler_config_end
 
 #------------------------------------------------------------------------------
 # MPI Support
@@ -45,15 +43,13 @@ set(MPIEXEC_NUMPROC_FLAG "-n" CACHE PATH "")
 #------------------------------------------------------------------------------
 # CUDA support
 #------------------------------------------------------------------------------
-#_blt_tutorial_cuda_config_start
 set(ENABLE_CUDA ON CACHE BOOL "")
 
-set(CUDA_TOOLKIT_ROOT_DIR "/usr/tce/packages/cuda/cuda-12.2.2" CACHE PATH "")
-set(CMAKE_CUDA_COMPILER "${CUDA_TOOLKIT_ROOT_DIR}/bin/nvcc" CACHE PATH "")
+set(CUDAToolkit_ROOT "/usr/tce/packages/cuda/cuda-12.2.2" CACHE PATH "")
+set(CMAKE_CUDA_COMPILER "${CUDAToolkit_ROOT}/bin/nvcc" CACHE PATH "")
 set(CMAKE_CUDA_HOST_COMPILER "${CMAKE_CXX_COMPILER}" CACHE PATH "")
 
 set(CMAKE_CUDA_ARCHITECTURES "70" CACHE STRING "")
-set(CMAKE_CUDA_FLAGS "-restrict --expt-extended-lambda -G" CACHE STRING "")
+set(CMAKE_CUDA_FLAGS "" CACHE STRING "")
 
-set(CUDA_SEPARABLE_COMPILATION ON CACHE BOOL "" )
-#_blt_tutorial_cuda_config_end
+set(CMAKE_CUDA_SEPARABLE_COMPILATION ON CACHE BOOL "" )

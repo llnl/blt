@@ -95,12 +95,21 @@ CUDA
 Finally, ``test_3`` builds and tests the ``calc_pi_cuda`` library,
 which uses CUDA to parallelize the calculation over the integration intervals.
 
-To enable CUDA, we set ``ENABLE_CUDA``, ``CMAKE_CUDA_COMPILER``, 
-``CMAKE_CUDA_ARCHITECTURES``, and ``CUDA_TOOLKIT_ROOT_DIR`` in our host config file.
-Also before enabling the CUDA language in CMake, you need to set 
-``CMAKE_CUDA_HOST_COMPILER`` in CMake 3.9+ or ``CUDA_HOST_COMPILER`` in previous versions.
-If you do not call ``enable_language(CUDA)``, BLT will set the appropriate host
-compiler variable for you and enable the CUDA language.
+To enable CUDA, we set the following variables in our host-config:
+
+  * ``ENABLE_CUDA``
+  * ``CMAKE_CUDA_COMPILER``
+  * ``CMAKE_CUDA_HOST_COMPILER``
+  * ``CMAKE_CUDA_ARCHITECTURES``
+  * ``CUDAToolkit_ROOT``
+
+It is important to do this before calling `enable_language(CUDA)`. If you do not call
+``enable_language(CUDA)``, BLT will set the appropriate host compiler variable for you
+and enable the CUDA language.
+
+.. note::
+   To enable clang-cuda instead of compiling with ``nvcc``, set your ``CMAKE_CUDA_COMPILER``
+   to ``clang``. There is an example host-config in ``host-configs/llnl/toss_4_x86_64_ib/llvm@22.1.5_clang_cuda.cmake``.
 
 .. note::
    The ``BLT_CXX_STD`` variable is useful to set the C++ and CUDA language standard to the
@@ -108,7 +117,7 @@ compiler variable for you and enable the CUDA language.
 
 Here is a snippet with these settings for LLNL's Matrix Cluster:
 
-.. literalinclude:: ../../host-configs/llnl/toss_4_x86_64_ib/gcc@10.3.1_nvcc.cmake
+.. literalinclude:: ../../host-configs/llnl/toss_4_x86_64_ib/llvm@19.3.1_nvcc.cmake
    :start-after: _blt_tutorial_cuda_config_start
    :end-before:  _blt_tutorial_cuda_config_end
    :language: cmake
@@ -122,10 +131,10 @@ Here, you can see how ``calc_pi_cuda`` and ``test_3`` use ``DEPENDS_ON``:
 
 The ``blt::cuda`` dependency for ``calc_pi_cuda`` is a little special, 
 along with adding the normal CUDA library and headers to your library or executable,
-it also tells BLT that this target's C/C++/CUDA source files need to be compiled via
-``nvcc`` or ``cuda-clang``. If this is not a requirement, you can use the dependency
-``blt::cuda_runtime`` which also adds the CUDA runtime library and headers but will not
-compile each source file with ``nvcc``.
+it also tells BLT that this target's C/C++/CUDA source files need to be compiled as
+CUDA language sources. If this is not a requirement, you can use the dependency
+``blt::cuda_runtime`` which adds the CUDA runtime library and headers but will not
+change the language of your source files.
 
 .. note::
    If you are using GoogleTest and ``nvcc``, you will need to set 

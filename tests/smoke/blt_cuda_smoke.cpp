@@ -17,6 +17,8 @@
 #include <iostream>
 #include <stdio.h>
 
+#include "../cuda_test_helpers.hpp"
+
 __device__ const char *STR = "HELLO WORLD!";
 const char STR_LENGTH = 12;
 
@@ -27,12 +29,24 @@ __global__ void hello()
 
 int main()
 {
+  if (!blt::test::require_cuda_device("blt_cuda_smoke"))
+  {
+    return 1;
+  }
+
   int num_threads = STR_LENGTH;
   int num_blocks = 1;
   hello<<<num_blocks,num_threads>>>();
-  cudaDeviceSynchronize();
+  cudaError_t result = cudaGetLastError();
+  if (!blt::test::check_cuda_call(result,
+                                  "blt_cuda_smoke",
+                                  "hello kernel launch"))
+  {
+    return 1;
+  }
 
-  return 0;
+  result = cudaDeviceSynchronize();
+  return blt::test::check_cuda_call(result,
+                                    "blt_cuda_smoke",
+                                    "cudaDeviceSynchronize") ? 0 : 1;
 }
-
-

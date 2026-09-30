@@ -19,19 +19,37 @@
 #include "cuda_runtime_api.h"
 #include <stdio.h>
 
+#include "../cuda_test_helpers.hpp"
+
 int main()
 {
-  int nDevices;
+  int nDevices = 0;
+  if (!blt::test::require_cuda_device("blt_cuda_runtime_smoke", &nDevices))
+  {
+    return 1;
+  }
 
-  cudaGetDeviceCount(&nDevices);
   for (int i = 0; i < nDevices; i++)
   {
     cudaDeviceProp prop;
     int memoryClockRate;
-    cudaGetDeviceProperties(&prop, i);
+    if (!blt::test::check_cuda_call(cudaGetDeviceProperties(&prop, i),
+                                    "blt_cuda_runtime_smoke",
+                                    "cudaGetDeviceProperties"))
+    {
+      return 1;
+    }
 
 #if CUDART_VERSION >= 13000
-    cudaDeviceGetAttribute(&memoryClockRate, cudaDevAttrMemoryClockRate, i);
+    if (!blt::test::check_cuda_call(
+          cudaDeviceGetAttribute(&memoryClockRate,
+                                 cudaDevAttrMemoryClockRate,
+                                 i),
+          "blt_cuda_runtime_smoke",
+          "cudaDeviceGetAttribute(cudaDevAttrMemoryClockRate)"))
+    {
+      return 1;
+    }
 #else
     memoryClockRate = prop.memoryClockRate;
 #endif

@@ -13,6 +13,7 @@
 #include <string>
 #include "cuda_runtime_api.h"
 
+#include "../cuda_test_helpers.hpp"
 
 int main()
 {
@@ -20,24 +21,28 @@ int main()
   int         runtimeVersion = 0;
   cudaError_t error_id;
 
+  if (!blt::test::require_cuda_device("blt_cuda_version_smoke"))
+  {
+    return 1;
+  }
+
   error_id = cudaDriverGetVersion(&driverVersion);
-  if (error_id != cudaSuccess) {
-    std::string msg = "cudaDriverGetVersion returned CUDA Error (" + std::to_string(error_id) +
-                      "): " + cudaGetErrorString(error_id) + "\n";
-    std::cerr << msg;
+  if (!blt::test::check_cuda_call(error_id,
+                                  "blt_cuda_version_smoke",
+                                  "cudaDriverGetVersion"))
+  {
     return 1;
   }
   std::cout << "CUDA driver version: " << driverVersion << std::endl;
 
   error_id = cudaRuntimeGetVersion(&runtimeVersion);
-  if (error_id != cudaSuccess) {
-    std::string msg = "cudaDriverGetVersion returned CUDA Error (" + std::to_string(error_id) +
-                      "): " + cudaGetErrorString(error_id) + "\n";
-    std::cerr << msg;
+  if (!blt::test::check_cuda_call(error_id,
+                                  "blt_cuda_version_smoke",
+                                  "cudaRuntimeGetVersion"))
+  {
     return 2;
   }
   std::cout << "CUDA runtime version: " << runtimeVersion << std::endl;
 
   return 0;
 }
-

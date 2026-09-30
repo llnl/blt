@@ -198,7 +198,7 @@ macro(blt_add_library)
 
         add_library( ${arg_NAME} ${_lib_type} ${arg_SOURCES} ${arg_HEADERS} )
 
-        if (BLT_ENABLE_CUDA AND NOT BLT_ENABLE_CLANG_CUDA)
+        if (BLT_ENABLE_CUDA)
             blt_setup_cuda_target(
                 NAME         ${arg_NAME}
                 SOURCES      ${arg_SOURCES}
@@ -320,7 +320,7 @@ macro(blt_add_executable)
 
     add_executable( ${arg_NAME} ${arg_SOURCES} ${arg_HEADERS})
 
-    if (BLT_ENABLE_CUDA AND NOT BLT_ENABLE_CLANG_CUDA)
+    if (BLT_ENABLE_CUDA)
         blt_setup_cuda_target(
             NAME         ${arg_NAME}
             SOURCES      ${arg_SOURCES}

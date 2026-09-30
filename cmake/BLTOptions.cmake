@@ -55,11 +55,6 @@ option(ENABLE_FORTRAN      "Enables Fortran compiler support" ${_fortran_already
 option(ENABLE_MPI          "Enables MPI support" OFF)
 option(ENABLE_OPENMP       "Enables OpenMP compiler support" OFF)
 option(ENABLE_CUDA         "Enable CUDA support" OFF)
-cmake_dependent_option(ENABLE_CLANG_CUDA   "Enable Clang's native CUDA support" OFF
-                       "ENABLE_CUDA" OFF)
-mark_as_advanced(ENABLE_CLANG_CUDA)
-set(BLT_CLANG_CUDA_ARCH "sm_30" CACHE STRING "Compute architecture to use when generating CUDA code with Clang")
-mark_as_advanced(BLT_CLANG_CUDA_ARCH)
 option(ENABLE_HIP         "Enable HIP support" OFF)
 set(CMAKE_HIP_ARCHITECTURES "gfx900" CACHE STRING "gfx architecture to use when generating HIP/ROCm code")
 

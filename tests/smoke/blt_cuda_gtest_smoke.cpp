@@ -18,6 +18,7 @@
 #include <stdio.h>
 
 #include "gtest/gtest.h"
+#include "../cuda_test_helpers.hpp"
 
 __device__ const char *STR = "HELLO WORLD!";
 const char STR_LENGTH = 12;
@@ -35,6 +36,21 @@ TEST(blt_cuda_gtest_smoke,basic_assert_example)
   int num_threads = STR_LENGTH;
   int num_blocks = 1;
   hello<<<num_blocks,num_threads>>>();
-  cudaDeviceSynchronize();
-  EXPECT_TRUE( true );
+  ASSERT_TRUE(blt::test::check_cuda_call(cudaGetLastError(),
+                                         "blt_cuda_gtest_smoke",
+                                         "hello kernel launch"));
+  ASSERT_TRUE(blt::test::check_cuda_call(cudaDeviceSynchronize(),
+                                         "blt_cuda_gtest_smoke",
+                                         "cudaDeviceSynchronize"));
+}
+
+int main(int argc, char** argv)
+{
+  if (!blt::test::require_cuda_device("blt_cuda_gtest_smoke"))
+  {
+    return 1;
+  }
+
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

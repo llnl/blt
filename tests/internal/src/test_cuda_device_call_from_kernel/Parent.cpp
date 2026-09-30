@@ -6,6 +6,15 @@
 #include "Parent.hpp"
 #include <string.h>
 
+#if defined(__clang__) && !defined(__NVCC__)
+// Clang's CUDA runtime omits this device symbol, which is referenced by
+// Parent's pure-virtual device vtable.
+extern "C" __device__ void __cxa_pure_virtual()
+{
+  __builtin_trap();
+}
+#endif
+
 __host__ __device__ Parent::Parent(const char *id, int order)
   : m_gpuParent(NULL)
   , m_gpuExtractedParents(NULL)
@@ -13,4 +22,3 @@ __host__ __device__ Parent::Parent(const char *id, int order)
 
 __global__ void kernelDelete(Parent** myGpuParent) {}
 __global__ void kernelDeleteExtracted(Parent*** gpuExtractedParents) {}
-

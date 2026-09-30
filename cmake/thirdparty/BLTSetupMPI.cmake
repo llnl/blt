@@ -30,6 +30,11 @@ set(_mpi_compile_flags )
 set(_mpi_includes )
 set(_mpi_libraries )
 set(_mpi_link_flags )
+set(_cuda_host_flag_prefix "")
+
+if(BLT_ENABLE_CUDA AND "${CMAKE_CUDA_COMPILER}" MATCHES "nvcc")
+    set(_cuda_host_flag_prefix "-Xcompiler=")
+endif()
 
 
 if(BLT_ENABLE_FIND_MPI)
@@ -53,7 +58,7 @@ if (BLT_ENABLE_FIND_MPI)
     if (_c_flag AND BLT_ENABLE_CUDA)
         list(APPEND _mpi_compile_flags
                     $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:${_c_flag}>
-                    $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=${_c_flag}>)
+                    $<$<COMPILE_LANGUAGE:CUDA>:${_cuda_host_flag_prefix}${_c_flag}>)
     else()
         list(APPEND _mpi_compile_flags ${_c_flag})
     endif()
@@ -63,7 +68,7 @@ if (BLT_ENABLE_FIND_MPI)
         if (BLT_ENABLE_CUDA)
             list(APPEND _mpi_compile_flags
             $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:${_cxx_flag}>
-            $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=${_cxx_flag}>)
+            $<$<COMPILE_LANGUAGE:CUDA>:${_cuda_host_flag_prefix}${_cxx_flag}>)
         else()
             list(APPEND _mpi_compile_flags ${_cxx_flag})
         endif()

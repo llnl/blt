@@ -95,7 +95,7 @@ if(ENABLE_GTEST)
     # Test 3: Add cuda version of calc_pi, and expand test 1 to also test 
     # the cuda version.
     #------------------------------------------------------------------------------
-    if(CUDA_FOUND)
+    if(ENABLE_CUDA)
     # _blt_tutorial_calcpi_cuda_start
         
         blt_add_library( NAME       calc_pi_cuda
