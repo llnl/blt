@@ -31,11 +31,18 @@ endif()
 
 # Backwards compatibility
 if(CUDA_TOOLKIT_ROOT_DIR AND NOT CUDAToolkit_ROOT)
+    message(WARNING
+        "CUDA_TOOLKIT_ROOT_DIR has been removed. Setting CUDAToolkit_ROOT for "
+        "backwards compatibility. Please migrate to CUDAToolkit_ROOT.")
     set(CUDAToolkit_ROOT "${CUDA_TOOLKIT_ROOT_DIR}" CACHE PATH
         "Root directory of the CUDA Toolkit" FORCE)
 endif()
 
 if(DEFINED CUDA_SEPARABLE_COMPILATION AND NOT DEFINED CMAKE_CUDA_SEPARABLE_COMPILATION)
+    message(WARNING
+        "CUDA_SEPARABLE_COMPILATION has been removed. Setting "
+        "CMAKE_CUDA_SEPARABLE_COMPILATION for backwards compatibility. Please "
+        "migrate to CMAKE_CUDA_SEPARABLE_COMPILATION.")
     set(CMAKE_CUDA_SEPARABLE_COMPILATION "${CUDA_SEPARABLE_COMPILATION}" CACHE BOOL
         "Build CUDA objects with separable compilation enabled" FORCE)
 endif()
