@@ -401,46 +401,82 @@ endmacro(blt_setup_hip_target)
 
 ##------------------------------------------------------------------------------
 ## blt_setup_hip_early_rdc_target(NAME        <base target name>
-##                                 RDC_SOURCES <HIP sources requiring RDC>
-##                                 DEPENDS_ON  <dependency list for HIP build>
-##                                 INCLUDES    <include directories for HIP build>
-##                                 HEADERS     <headers associated with RDC_SOURCES>
-##                                 SUFFIX      <suffix for generated targets; default: BLT_EARLY_RDC_SUFFIX or "_earlyrdc">
-##                                 OBJECT      <TRUE if NAME is an OBJECT library, otherwise FALSE>
-##                                 FULL_RDC    <TRUE when all HIP sources in NAME require RDC; RDC_SOURCES/HEADERS are ignored>)
+##                                RDC_SOURCES <HIP sources requiring RDC>
+##                                DEPENDS_ON  <dependency list for HIP build>
+##                                INCLUDES    <include directories for HIP build>
+##                                HEADERS     <headers associated with RDC_SOURCES>
+##                                SUFFIX      <suffix for generated targets; default: BLT_EARLY_RDC_SUFFIX or "">
+##                                OBJECT      <TRUE if NAME is an OBJECT library, otherwise FALSE>
+##                                FULL_RDC    <TRUE when all HIP sources in NAME require RDC; RDC_SOURCES/HEADERS are ignored>
+##                                EXTRA_ARCHIVES <extra archives added to the erdc.sh command line>)
 ##
 ## When FULL_RDC is FALSE (default):
-##   - Creates a static host RDC library <NAME><SUFFIX>_host from RDC_SOURCES (+HEADERS),
+##   - Creates a static library <NAME><SUFFIX>_rdc from RDC_SOURCES (+HEADERS),
 ##     compiled with -fgpu-rdc and configured with DEPENDS_ON/INCLUDES.
-##   - Runs erdc.sh on <NAME><SUFFIX>_host to produce a single "uber" device object
-##     and wraps it in the static library <NAME><SUFFIX>_device.
-##   - Adds <NAME><SUFFIX>_host as a build dependency of NAME and links NAME
-##     INTERFACE to <NAME><SUFFIX>_device. The generated device archive replaces
-##     the host input archive for consumers because uber.o contains the host code.
+##   - Runs erdc.sh on <NAME><SUFFIX>_rdc to produce a single "uber" object
+##     and wraps it in the static library <NAME><SUFFIX>_erdc.
+##   - Adds <NAME><SUFFIX>_rdc as a build dependency of NAME and links NAME
+##     INTERFACE to <NAME><SUFFIX>_erdc. The <NAME><SUFFIX>_erdc archive replaces
+##     the <NAME><SUFFIX>_rdc archive for consumers because uber.o contains
+##     machine code for the host and machine code for the device.
 ##
 ## When FULL_RDC is TRUE:
 ##   - Compiles NAME itself with -fgpu-rdc (using INCLUDES),
-##     then runs erdc.sh on NAME’s archive to produce the "uber" device object
-##     wrapped in <NAME><SUFFIX>_device.
-##   - Links NAME INTERFACE to <NAME><SUFFIX>_device only (no separate host RDC library).
+##     then runs erdc.sh on NAME’s archive to produce the "uber" object
+##     wrapped in <NAME><SUFFIX>_erdc.
+##   - Links NAME INTERFACE to <NAME><SUFFIX>_erdc only (no <NAME><SUFFIX>_rdc library).
 ##
 ## In both modes:
-##   - <NAME><SUFFIX>_device is a static library containing the early-RDC "uber"
-##     device object, with LINKER_LANGUAGE set to CXX, and is linked INTERFACE
-##     from NAME so consumers automatically receive the device code.
+##   - <NAME><SUFFIX>_erdc is a static library containing the "uber" object,
+##     with LINKER_LANGUAGE set to CXX, and is linked INTERFACE from NAME
+##     so consumers automatically receive the machine code for the device
+##     (instead of LLVM IR bitcode for the device).
+##
+## The table below describes the code in the archives created by this macro:
+##
+##          |   libfoo_rdc.a   libfoo_erdc.a
+##   -------|-------------------------------
+##     X86  |   Machine code   Machine code
+##   AMDGPU | LLVM IR bitcode  Machine code
+##
+## where we have assumed that hip is being used to generate code for the X86 and
+## AMDGPU architectures. The presence/absence of LLVM IR bitcode in the archives
+## can be verified by running llvm-objdump -h to list the ELF section headers:
+##
+## $ llvm-objdump -h libfoo_rdc.a | grep __CLANG_OFFLOAD_BUNDLE__ | wc -l
+## 800
+## $ llvm-objdump -h libfoo_erdc.a | grep __CLANG_OFFLOAD_BUNDLE__ | wc -l
+## 0
+##
+## The object files in the libfoo_rdc.a archive have __CLANG_OFFLOAD_BUNDLE__
+## sections with LLVM IR bitcode, and the object files in libfoo_erdc.a do not.
+## In this case, libfoo_rdc.a had 800 __CLANG_OFFLOAD_BUNDLE__ sections, but
+## this number might be more or less than 800 (it depends on the number of
+## object files in the archive that were compiled with -fgpu-rdc).
+##
+## For more details, see https://github.com/llvm/llvm-project/issues/77018.
+##
+## EXAMPLES:
+##
+## blt_setup_hip_early_rdc_target(NAME foo
+##                                FULL_RDC TRUE)
+##                                
+## blt_setup_hip_early_rdc_target(NAME bar
+##                                FULL_RDC TRUE
+##                                EXTRA_ARCHIVES ${BAZ_DIR}/lib/libbaz.a)
 ##------------------------------------------------------------------------------
 macro(blt_setup_hip_early_rdc_target)
 
     set(options)
     set(singleValueArgs NAME SUFFIX OBJECT INTERFACE FULL_RDC)
-    set(multiValueArgs RDC_SOURCES DEPENDS_ON INCLUDES HEADERS)
+    set(multiValueArgs RDC_SOURCES DEPENDS_ON INCLUDES HEADERS EXTRA_ARCHIVES)
 
     cmake_parse_arguments(arg "${options}" "${singleValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if(NOT DEFINED arg_NAME)
         message(FATAL_ERROR "blt_setup_hip_early_rdc_target requires NAME")
     endif()
-    if(NOT DEFINED arg_RDC_SOURCES AND NOT DEFINED FULL_RDC AND NOT FULL_RDC)
+    if(NOT DEFINED arg_RDC_SOURCES AND NOT arg_FULL_RDC)
         message(FATAL_ERROR "blt_setup_hip_early_rdc_target requires RDC_SOURCES unless FULL_RDC is set to TRUE")
     endif()
 
@@ -448,7 +484,7 @@ macro(blt_setup_hip_early_rdc_target)
         if(DEFINED BLT_EARLY_RDC_SUFFIX)
             set(arg_SUFFIX "${BLT_EARLY_RDC_SUFFIX}")
         else()
-            set(arg_SUFFIX "_earlyrdc")
+            set(arg_SUFFIX "")
         endif()
     endif()
     message(STATUS "[BLT] Configuring HIP early RDC for '${arg_NAME}' with suffix '${arg_SUFFIX}'")
@@ -475,17 +511,17 @@ macro(blt_setup_hip_early_rdc_target)
     # the call to blt_setup* will override arg_NAME, remember it for later use
     set(_erdc_arg_name ${arg_NAME} )
     if(NOT arg_FULL_RDC)
-        # Create host RDC library from RDC_SOURCES and compile with -fgpu-rdc
-        set(_erdc_host "${arg_NAME}${arg_SUFFIX}_host")
-        add_library( ${_erdc_host} STATIC ${arg_RDC_SOURCES} ${arg_HEADERS})
-        blt_setup_target(NAME ${_erdc_host}
+        # Create <NAME><SUFFIX>_rdc library from RDC_SOURCES and compile with -fgpu-rdc
+        set(_rdc_library "${arg_NAME}${arg_SUFFIX}_rdc")
+        add_library( ${_rdc_library} STATIC ${arg_RDC_SOURCES} ${arg_HEADERS})
+        blt_setup_target(NAME ${_rdc_library}
                          DEPENDS_ON ${arg_DEPENDS_ON}
                          OBJECT ${arg_OBJECT})
-        blt_setup_hip_target(NAME ${_erdc_host} SOURCES ${arg_RDC_SOURCES} DEPENDS_ON ${arg_DEPENDS_ON})
-        target_include_directories(${_erdc_host} PUBLIC ${arg_INCLUDES})
-        target_compile_options(${_erdc_host} PRIVATE $<$<COMPILE_LANGUAGE:HIP>:-fgpu-rdc>)
+        blt_setup_hip_target(NAME ${_rdc_library} SOURCES ${arg_RDC_SOURCES} DEPENDS_ON ${arg_DEPENDS_ON})
+        target_include_directories(${_rdc_library} PUBLIC ${arg_INCLUDES})
+        target_compile_options(${_rdc_library} PRIVATE $<$<COMPILE_LANGUAGE:HIP>:-fgpu-rdc>)
     else()
-        # FULL_RDC: compile base target with HIP RDC flags, use its archive as input to erdc.sh
+        # FULL_RDC: compile base target with -fgpu-rdc and use its archive as input to erdc.sh
         target_include_directories(${arg_NAME} PUBLIC ${arg_INCLUDES})
         target_compile_options(${arg_NAME} PRIVATE $<$<COMPILE_LANGUAGE:HIP>:-fgpu-rdc>)
     endif()
@@ -493,52 +529,52 @@ macro(blt_setup_hip_early_rdc_target)
     set(arg_NAME ${_erdc_arg_name})
 
     if(NOT arg_FULL_RDC)
-        # The host archive is private to the EARLY-RDC transformation, but its
+        # _rdc_library is private to the EARLY-RDC transformation, but its
         # sources must see the same usage requirements as the public base target.
         # Use generator expressions so requirements added after this macro call
         # (for example, feature compile definitions) are also reflected here.
-        target_include_directories(${_erdc_host} PRIVATE
+        target_include_directories(${_rdc_library} PRIVATE
             $<TARGET_PROPERTY:${arg_NAME},INTERFACE_INCLUDE_DIRECTORIES>)
-        target_compile_definitions(${_erdc_host} PRIVATE
+        target_compile_definitions(${_rdc_library} PRIVATE
             $<TARGET_PROPERTY:${arg_NAME},INTERFACE_COMPILE_DEFINITIONS>)
     endif()
 
     if(NOT arg_FULL_RDC)
-        # add _erdc_host as a dependency to arg_NAME, to ensure it gets built
-        add_dependencies(${arg_NAME} ${_erdc_host})
+        # add _rdc_library as a dependency to arg_NAME, to ensure it gets built
+        add_dependencies(${arg_NAME} ${_rdc_library})
     endif()
     
     # Paths
     set(_erdc_build_dir "${CMAKE_CURRENT_BINARY_DIR}/${arg_NAME}_erdc")
     file(MAKE_DIRECTORY "${_erdc_build_dir}")
 
-    # Select erdc input: host RDC lib (partial) or base target archive (full)
+    # Select erdc input: <NAME><SUFFIX>_rdc (partial) or base target archive (full)
     if(arg_FULL_RDC)
         set(_erdc_input "$<TARGET_FILE:${arg_NAME}>")
         set(_erdc_input_depends ${arg_NAME})
     else()
-        set(_erdc_input "$<TARGET_FILE:${_erdc_host}>")
-        set(_erdc_input_depends ${_erdc_host})
+        set(_erdc_input "$<TARGET_FILE:${_rdc_library}>")
+        set(_erdc_input_depends ${_rdc_library})
     endif()
 
     # Add extra input archives to erdc.sh from DEPENDS_ON.
-    # If a dependency exposes an "*${arg_SUFFIX}_host" target in its link interface, include it.
+    # If a dependency exposes an "*${arg_SUFFIX}_rdc" target in its link interface, include it.
     set(_erdc_extra_input_targets)
     foreach(_dep ${arg_DEPENDS_ON})
         if(TARGET ${_dep})
             get_target_property(_dep_iface_libs ${_dep} INTERFACE_LINK_LIBRARIES)
             if(_dep_iface_libs)
-                set(_has_erdc_device FALSE)
+                set(_has_erdc_library FALSE)
                 foreach(_iface ${_dep_iface_libs})
-                    if(TARGET ${_iface} AND "${_iface}" MATCHES "${arg_SUFFIX}_device$")
-                        set(_has_erdc_device TRUE)
+                    if(TARGET ${_iface} AND "${_iface}" MATCHES "${arg_SUFFIX}_erdc$")
+                        set(_has_erdc_library TRUE)
                         break()
                     endif()
                 endforeach()
 
-                if(NOT _has_erdc_device)
+                if(NOT _has_erdc_library)
                     foreach(_iface ${_dep_iface_libs})
-                        if(TARGET ${_iface} AND "${_iface}" MATCHES "${arg_SUFFIX}_host$")
+                        if(TARGET ${_iface} AND "${_iface}" MATCHES "${arg_SUFFIX}_rdc$")
                             list(APPEND _erdc_extra_input_targets ${_iface})
                         endif()
     endforeach()
@@ -550,18 +586,18 @@ macro(blt_setup_hip_early_rdc_target)
     if(_erdc_extra_input_targets)
         list(REMOVE_DUPLICATES _erdc_extra_input_targets)
         if(NOT arg_FULL_RDC)
-            list(REMOVE_ITEM _erdc_extra_input_targets ${_erdc_host})
+            list(REMOVE_ITEM _erdc_extra_input_targets ${_rdc_library})
         endif()
         list(REMOVE_ITEM _erdc_extra_input_targets ${arg_NAME})
     endif()
 
-    set(_erdc_extra_inputs)
+    set(_erdc_extra_inputs ${arg_EXTRA_ARCHIVES})
     foreach(_tgt ${_erdc_extra_input_targets})
         list(APPEND _erdc_extra_inputs "$<TARGET_FILE:${_tgt}>")
     endforeach()
 
     # The erdc.sh script will take a static library and produce uber.o; we will use that as the source
-    # for the ${arg_NAME}${arg_SUFFIX} target
+    # for the <NAME><SUFFIX>_erdc target
     set(_erdc_output_obj "${_erdc_build_dir}/uber.o")
     message(STATUS "[BLT] Early RDC build dir='${_erdc_build_dir}' input='${_erdc_input}' output='${_erdc_output_obj}'")
 
@@ -573,20 +609,19 @@ macro(blt_setup_hip_early_rdc_target)
         COMMENT "EARLY RDC: generate early RDC archive for ${arg_NAME}, calling ${BLT_ROOT_DIR}/scripts/erdc.sh ${_erdc_input} \n\t with ROCM_PATH=${ROCM_PATH}, ARCH_FLAGS=${_erdc_arch_flags}"
     )
     
-    # Create a static library target containing the generated early-RDC object.
-    add_library(${arg_NAME}${arg_SUFFIX}_device STATIC ${_erdc_output_obj})
+    # Create a static library target containing the generated uber.o
+    add_library(${arg_NAME}${arg_SUFFIX}_erdc STATIC ${_erdc_output_obj})
 
-    # add C++ as the linker language for ${arg_NAME}${arg_SUFFIX}, HIP linking has already happened
-    set_target_properties(${arg_NAME}${arg_SUFFIX}_device PROPERTIES LINKER_LANGUAGE CXX)
+    # add C++ as the linker language for <NAME><SUFFIX>_erdc, HIP linking has already happened
+    set_target_properties(${arg_NAME}${arg_SUFFIX}_erdc PROPERTIES LINKER_LANGUAGE CXX)
     
 
     # Propagate the generated archive to base target consumers. The uber.o emitted
-    # by erdc.sh contains both the device image and the host code from its input
-    # archive, so the input host archive must not also be linked transitively.
+    # by erdc.sh contains machine code for the host and machine code for the device.
     if(${arg_INTERFACE})
-        target_link_libraries(${arg_NAME} INTERFACE ${arg_NAME}${arg_SUFFIX}_device)
+        target_link_libraries(${arg_NAME} INTERFACE ${arg_NAME}${arg_SUFFIX}_erdc)
     else()
-        target_link_libraries(${arg_NAME} PUBLIC ${arg_NAME}${arg_SUFFIX}_device)
+        target_link_libraries(${arg_NAME} PUBLIC ${arg_NAME}${arg_SUFFIX}_erdc)
     endif()
 
 endmacro(blt_setup_hip_early_rdc_target)
