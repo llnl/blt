@@ -95,11 +95,21 @@ CUDA
 Finally, ``test_3`` builds and tests the ``calc_pi_cuda`` library,
 which uses CUDA to parallelize the calculation over the integration intervals.
 
-To enable CUDA, we set ``ENABLE_CUDA``, ``CMAKE_CUDA_COMPILER``, ``CMAKE_CUDA_HOST_COMPILER``, 
-``CMAKE_CUDA_ARCHITECTURES``, and ``CUDAToolkit_ROOT`` in our host config file.
+To enable CUDA, we set the following variables in our host-config:
+
+  * ``ENABLE_CUDA``
+  * ``CMAKE_CUDA_COMPILER``
+  * ``CMAKE_CUDA_HOST_COMPILER``
+  * ``CMAKE_CUDA_ARCHITECTURES``
+  * ``CUDAToolkit_ROOT``
+
 It is important to do this before calling `enable_language(CUDA)`. If you do not call
 ``enable_language(CUDA)``, BLT will set the appropriate host compiler variable for you
 and enable the CUDA language.
+
+.. note::
+   To enable clang-cuda instead of compiling with ``nvcc``, set your ``CMAKE_CUDA_COMPILER``
+   to ``clang``. There is an example host-config in ``host-configs/llnl/toss_4_x86_64_ib/llvm@22.1.5_clang_cuda.cmake``.
 
 .. note::
    The ``BLT_CXX_STD`` variable is useful to set the C++ and CUDA language standard to the
@@ -107,7 +117,7 @@ and enable the CUDA language.
 
 Here is a snippet with these settings for LLNL's Matrix Cluster:
 
-.. literalinclude:: ../../host-configs/llnl/toss_4_x86_64_ib/gcc@10.3.1_nvcc.cmake
+.. literalinclude:: ../../host-configs/llnl/toss_4_x86_64_ib/llvm@19.3.1_nvcc.cmake
    :start-after: _blt_tutorial_cuda_config_start
    :end-before:  _blt_tutorial_cuda_config_end
    :language: cmake

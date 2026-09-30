@@ -53,6 +53,7 @@ set(ENABLE_CUDA ON CACHE BOOL "")
 # separable compilation, so use the latest compatible CUDA 12 release.
 set(CUDAToolkit_ROOT "/usr/tce/packages/cuda/cuda-12.9.1" CACHE PATH "")
 
+# Note: setting the CUDA compiler to clang instead of nvcc is what makes this clang-cuda
 set(CMAKE_CUDA_COMPILER "${CMAKE_CXX_COMPILER}" CACHE PATH "")
 
 set(CMAKE_CUDA_ARCHITECTURES "90" CACHE STRING "")
