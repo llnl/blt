@@ -227,15 +227,3 @@ More complicated host-config that has C, C++, MPI, and CUDA support:
         :language: cmake
         :linenos:
 
-Here is a full example host-config file for an OSX laptop, using a set of dependencies built with Spack:
-
-.. container:: toggle
-
-    .. container:: label
-
-        ``OSX clang@7.3.0 host-config``
-
-    .. literalinclude::  ../../host-configs/darwin/elcapitan-x86_64/naples-clang@7.3.0.cmake
-        :language: cmake
-        :linenos:
-
