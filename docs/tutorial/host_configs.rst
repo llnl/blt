@@ -39,7 +39,7 @@ using specific gcc (version 10.3.1 in this case) on the LLNL Matrix cluster:
    :language: cmake
 
 
-Building and Testing on Dane
+Building and Testing on Matrix
 ------------------------------
 
 Since compute nodes on the Matrix cluster have CPUs and GPUs, here is how you
