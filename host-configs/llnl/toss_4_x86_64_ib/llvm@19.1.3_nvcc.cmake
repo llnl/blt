@@ -15,6 +15,7 @@
 #------------------------------------------------------------------------------
 # Compilers
 #------------------------------------------------------------------------------
+# _blt_matrix_compiler_config_start
 set(CMAKE_C_COMPILER "/usr/tce/packages/clang/clang-19.1.3-magic/bin/clang" CACHE PATH "")
 set(CMAKE_CXX_COMPILER "/usr/tce/packages/clang/clang-19.1.3-magic/bin/clang++" CACHE PATH "")
 set(CMAKE_Fortran_COMPILER "/usr/tce/packages/gcc/gcc-13.3.1/bin/gfortran" CACHE PATH "")
@@ -26,6 +27,7 @@ set(CMAKE_Fortran_FLAGS "-fPIC" CACHE STRING "")
 set(ENABLE_FORTRAN ON CACHE BOOL "")
 
 set(BLT_EXE_LINKER_FLAGS " -Xlinker -rpath -Xlinker /usr/tce/packages/clang/clang-19.1.3-magic/lib" CACHE STRING "Adds a missing libstdc++ rpath")
+# _blt_matrix_compiler_config_end
 
 #------------------------------------------------------------------------------
 # MPI
@@ -47,6 +49,7 @@ set(ENABLE_MPI ON CACHE BOOL "")
 # Cuda
 #------------------------------------------------
 
+#_blt_tutorial_cuda_config_start
 set(ENABLE_CUDA ON CACHE BOOL "")
 
 set(CUDAToolkit_ROOT "/usr/tce/packages/cuda/cuda-13.1.1" CACHE PATH "")
@@ -63,6 +66,7 @@ set(CMAKE_CUDA_FLAGS "-Xcompiler=-fPIC" CACHE STRING "")
 
 # nvcc does not like gtest's 'pthreads' flag
 set(gtest_disable_pthreads ON CACHE BOOL "")
+#_blt_tutorial_cuda_config_end
 
 #------------------------------------------------
 # OpenMP
