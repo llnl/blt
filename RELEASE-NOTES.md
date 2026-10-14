@@ -9,6 +9,10 @@ The project release numbers follow [Semantic Versioning](http://semver.org/spec/
 
 ## [Unreleased] - Release date yyyy-mm-dd
 
+### Added
+- Adds `PROCESSORS` property to tests based on the number of mpi ranks (`NUM_MPI_THREADS`) and OpenMP threads (`NUM_OMP_THREADS`).
+  This gives CTest more context for scheduling tests.
+
 ### Changed
 - Modified `blt_add_sphinx_target` to allow setting sphinx source and configure directories.
 - Modified `blt_add_sphinx_target` and `blt_add_doxygen_target` requiring the first argument preceed with TARGET.

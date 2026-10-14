@@ -461,8 +461,10 @@ macro(blt_add_test)
     # Handle MPI
     if( arg_NUM_MPI_TASKS )
         # first check that the number of ranks is a positive integer
-        string(REGEX MATCH "^-?[0-9]+$" _is_integer "${arg_NUM_MPI_TASKS}")
-        if( NOT _is_integer OR arg_NUM_MPI_TASKS LESS 1)
+        set(_num_mpi_tasks "${arg_NUM_MPI_TASKS}")
+        string(STRIP "${_num_mpi_tasks}" _num_mpi_tasks)
+        string(REGEX MATCH "^-?[0-9]+$" _is_integer "${_num_mpi_tasks}")
+        if( NOT _is_integer OR _num_mpi_tasks LESS 1)
             message(FATAL_ERROR "In blt_add_test(), attempted to run an mpi test with invalid NUM_MPI_TASKS: ${arg_NUM_MPI_TASKS}")
         endif()
 
@@ -475,8 +477,8 @@ macro(blt_add_test)
                 set(_mpiexec ${MPIEXEC})
             endif()
 
-            set(_test_command ${_mpiexec} ${MPIEXEC_NUMPROC_FLAG} ${arg_NUM_MPI_TASKS} ${BLT_MPI_COMMAND_APPEND} ${_test_command} )
-        elseif( arg_NUM_MPI_TASKS EQUAL 1)
+            set(_test_command ${_mpiexec} ${MPIEXEC_NUMPROC_FLAG} ${_num_mpi_tasks} ${BLT_MPI_COMMAND_APPEND} ${_test_command} )
+        elseif( _num_mpi_tasks EQUAL 1)
             # no-op: Allow NUM_MPI_TASKS to be 1 when not using MPI
         else()
             message(FATAL_ERROR "In blt_add_test(), attempted to invoke a test with ${arg_NUM_MPI_TASKS} ranks in a non-mpi configuration")
@@ -490,9 +492,35 @@ macro(blt_add_test)
 
     # Handle OpenMP
     if( arg_NUM_OMP_THREADS )
+        # Ensure the number of OpenMP threads is a positive integer
+        set(_num_omp_threads "${arg_NUM_OMP_THREADS}")
+        string(STRIP "${_num_omp_threads}" _num_omp_threads)
+        string(REGEX MATCH "^-?[0-9]+$" _is_integer "${_num_omp_threads}")
+        if( NOT _is_integer OR _num_omp_threads LESS 1)
+            message(FATAL_ERROR "In blt_add_test(), attempted to run a test with invalid NUM_OMP_THREADS: ${arg_NUM_OMP_THREADS}")
+        endif()
+
         set_property(TEST ${arg_NAME}
-                     APPEND PROPERTY ENVIRONMENT OMP_NUM_THREADS=${arg_NUM_OMP_THREADS})
+                     APPEND PROPERTY ENVIRONMENT OMP_NUM_THREADS=${_num_omp_threads})
     endif()
+
+    # Inform CTest how many processor slots this test needs for scheduling.
+    # When tests are parallelized with `ctest --parallel/-j`, CTest uses this
+    # property to avoid oversubscribing the available resources.
+    set(_blt_num_mpi_tasks 1)
+    if( arg_NUM_MPI_TASKS )
+        set(_blt_num_mpi_tasks ${_num_mpi_tasks})
+    endif()
+
+    set(_blt_num_omp_threads 1)
+    if( arg_NUM_OMP_THREADS )
+        set(_blt_num_omp_threads ${_num_omp_threads})
+    endif()
+
+    math(EXPR _blt_test_processors "${_blt_num_mpi_tasks} * ${_blt_num_omp_threads}")
+
+    set_tests_properties(${arg_NAME}
+                         PROPERTIES PROCESSORS ${_blt_test_processors})
 
 endmacro(blt_add_test)
 

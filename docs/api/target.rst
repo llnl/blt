@@ -315,6 +315,10 @@ is useful on machines that require extra arguments to ``MPIEXEC``.
 If ``NUM_OMP_THREADS`` is given, this macro will set the environment variable ``OMP_NUM_THREADS``
 before running this test.  This is done by appending to the CMake tests property.
 
+This macro also sets the CTest ``PROCESSORS`` property to help with test scheduling when using
+``ctest --parallel/-j``. The value is computed as ``NUM_MPI_TASKS * NUM_OMP_THREADS``, treating
+any omitted value as 1.
+
 .. note::
   If you do not require this macros command line assistance, you can call CMake's
   ``add_test()`` directly. For example, you may have a script checked into your
