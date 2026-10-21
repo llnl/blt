@@ -176,6 +176,9 @@ branch. In addition, the caller may specify the target Git repository using
 the ``SOURCE_DIR`` argument. Otherwise, if ``SOURCE_DIR`` is not specified, the
 macro will use ``CMAKE_CURRENT_SOURCE_DIR``.
 
+If ON_BRANCH is not specified and the current working tree is dirty (e.g.,
+files have been modified), then ``-dirty`` will be appended to the HASHCODE.
+
 A return code for the Git command is returned to the caller via the CMake
 variable provided with the ``RETURN_CODE`` argument. A non-zero return code
 indicates that an error has occurred.

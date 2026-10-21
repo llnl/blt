@@ -231,6 +231,7 @@ The project release numbers follow [Semantic Versioning](http://semver.org/spec/
   user-specified source directories
 - Code coverage targets leave LCOV-generated files intact for later use; these files will
   still be removed by ``make clean``
+- ``blt_git_hashcode`` will append a ``-dirty` suffix if the working tree is dirty (modified)
 
 ### Fixed
 - ClangFormat checks now support multiple Python executable names

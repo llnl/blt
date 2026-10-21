@@ -235,10 +235,11 @@ macro(blt_git_hashcode)
     endif()
 
     ## set target ref
+    ## match nothing to ensure that a tag isn't added
     if ( NOT DEFINED arg_ON_BRANCH )
-      set(git_cmd rev-parse --short HEAD )
+      set(git_cmd describe --match='$^' --always --dirty )
     else()
-      set(git_cmd rev-parse --short ${arg_ON_BRANCH} )
+      set(git_cmd describe --match='$^' --always ${arg_ON_BRANCH} )
     endif()
 
      blt_git( SOURCE_DIR ${git_dir}
