@@ -73,6 +73,8 @@ steps:
       -DCMAKE_C_COMPILER=/usr/bin/clang \
       -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
       -DENABLE_OPENMP=ON \
+      "-DOpenMP_C_FLAGS=-Xclang -fopenmp -I${LIBOMP_ROOT}/include" \
+      -DOpenMP_C_LIB_NAMES=omp \
       "-DOpenMP_CXX_FLAGS=-Xclang -fopenmp -I${LIBOMP_ROOT}/include" \
       -DOpenMP_CXX_LIB_NAMES=omp \
       "-DOpenMP_omp_LIBRARY=${LIBOMP_ROOT}/lib/libomp.dylib" \
