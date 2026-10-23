@@ -17,6 +17,7 @@ The project release numbers follow [Semantic Versioning](http://semver.org/spec/
 - Use `CUDAToolkit_ROOT` as the CUDA toolkit root variable. `CUDA_TOOLKIT_ROOT_DIR` is only read as a compatibility input and mapped to `CUDAToolkit_ROOT`.
 - Move separable compilation support to native CMake behavior via `CMAKE_CUDA_SEPARABLE_COMPILATION`. The old `CUDA_SEPARABLE_COMPILATION` variable is only mapped for compatibility.
 - Hardened CUDA smoke tests and tests against kernels not launching.
+- `blt::openmp` now appends `SHELL:` before flags to handle compilers that require multiple OpenMP flags (like apple-clang).
 
 ### Removed
 - Remove ENABLE_CLANG_CUDA and BLT_CLANG_CUDA_ARCH
