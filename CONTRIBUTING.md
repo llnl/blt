@@ -18,3 +18,5 @@ Since we want everyone to feel they are getting the proper attribution for their
 # Contributors
 
 Thanks to all of BLT's [contributors](https://github.com/LLNL/blt/graphs/contributors).
+
+- Sylvester Kaczmarek
