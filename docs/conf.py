@@ -1,5 +1,5 @@
-# Copyright (c) 2017-2025, Lawrence Livermore National Security, LLC and
-# other BLT Project Developers. See the top-level LICENSE file for details
+# Copyright (c) Lawrence Livermore National Security, LLC and other
+# BLT Project Developers. See the top-level LICENSE file for details
 # 
 # SPDX-License-Identifier: (BSD-3-Clause)
 
@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'BLT: Build, Link, and Test'
-copyright = u'2017-2025, BLT Development Team'
+copyright = u'BLT Development Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
