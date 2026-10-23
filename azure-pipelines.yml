@@ -45,6 +45,10 @@ strategy:
     osx_gcc:
       VM_ImageName: 'macos-14'
       CMAKE_FLAGS: ''
+    osx_appleclang_openmp:
+      VM_ImageName: 'macos-14'
+      APPLECLANG_OPENMP: 'ON'
+      CMAKE_FLAGS: ''
     windows:
       VM_ImageName: 'windows-2022'
       CMAKE_FLAGS: ''
@@ -58,12 +62,33 @@ steps:
   clean: true
 
 # OSX and Windows
+- bash: |
+    brew install libomp
+    libomp_root="$(brew --prefix libomp)"
+    echo "##vso[task.setvariable variable=LIBOMP_ROOT]${libomp_root}"
+  displayName: 'Install AppleClang OpenMP runtime'
+  condition: and(eq(variables['Agent.OS'], 'Darwin'), eq(variables['APPLECLANG_OPENMP'], 'ON'))
+- bash: |
+    cmake -S tests/internal -B build \
+      -DCMAKE_C_COMPILER=/usr/bin/clang \
+      -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
+      -DENABLE_OPENMP=ON \
+      "-DOpenMP_C_FLAGS=-Xclang -fopenmp -I${LIBOMP_ROOT}/include" \
+      -DOpenMP_C_LIB_NAMES=omp \
+      "-DOpenMP_CXX_FLAGS=-Xclang -fopenmp -I${LIBOMP_ROOT}/include" \
+      -DOpenMP_CXX_LIB_NAMES=omp \
+      "-DOpenMP_omp_LIBRARY=${LIBOMP_ROOT}/lib/libomp.dylib" \
+      "-DBLT_OPENMP_LINK_FLAGS=-L${LIBOMP_ROOT}/lib -lomp"
+  env:
+    LIBOMP_ROOT: $(LIBOMP_ROOT)
+  displayName: 'AppleClang OpenMP CMake'
+  condition: and(eq(variables['Agent.OS'], 'Darwin'), eq(variables['APPLECLANG_OPENMP'], 'ON'))
 - script: |
     mkdir build
     cd build
     cmake $(CMAKE_FLAGS) ../tests/internal
   displayName: 'OSX/Windows CMake'
-  condition: or( eq( variables['Agent.OS'], 'Windows_NT'), eq( variables['Agent.OS'], 'Darwin'))
+  condition: or(eq(variables['Agent.OS'], 'Windows_NT'), and(eq(variables['Agent.OS'], 'Darwin'), ne(variables['APPLECLANG_OPENMP'], 'ON')))
 - script: |
     cmake --build build --config Release
   displayName: 'OSX/Windows Build'

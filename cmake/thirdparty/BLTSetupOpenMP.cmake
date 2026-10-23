@@ -19,34 +19,36 @@ if(BLT_ENABLE_FORTRAN)
 endif()
 set(BLT_OPENMP_FLAGS_DIFFER ${_flags_differ} CACHE BOOL "")
 
-set(_compile_flags ${OpenMP_CXX_FLAGS})
+set(_compile_flags)
 set(_link_flags)
-set(_cuda_host_flag_prefix "")
 
+set(_cuda_host_flag_prefix "")
 if(BLT_ENABLE_CUDA AND "${CMAKE_CUDA_COMPILER}" MATCHES "nvcc")
     set(_cuda_host_flag_prefix "-Xcompiler=")
 endif()
 
-if( ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.18.0" )
-    set(_link_exp LINK_LANGUAGE)
+if(NOT COMPILER_FAMILY_IS_MSVC AND BLT_ENABLE_CUDA AND BLT_OPENMP_FLAGS_DIFFER)
+    set(_compile_flags
+        "$<$<AND:$<NOT:$<COMPILE_LANGUAGE:CUDA>>,$<NOT:$<COMPILE_LANGUAGE:Fortran>>>:SHELL:${OpenMP_CXX_FLAGS}>"
+        "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:${_cuda_host_flag_prefix}${OpenMP_CXX_FLAGS}>"
+        "$<$<COMPILE_LANGUAGE:Fortran>:SHELL:${OpenMP_Fortran_FLAGS}>")
+elseif(NOT COMPILER_FAMILY_IS_MSVC AND BLT_ENABLE_CUDA)
+    set(_compile_flags
+        "$<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:SHELL:${OpenMP_CXX_FLAGS}>"
+        "$<$<COMPILE_LANGUAGE:CUDA>:SHELL:${_cuda_host_flag_prefix}${OpenMP_CXX_FLAGS}>")
+elseif(NOT COMPILER_FAMILY_IS_MSVC AND BLT_OPENMP_FLAGS_DIFFER)
+    set(_compile_flags
+        "$<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:SHELL:${OpenMP_CXX_FLAGS}>"
+        "$<$<COMPILE_LANGUAGE:Fortran>:SHELL:${OpenMP_Fortran_FLAGS}>")
 else()
-    set(_link_exp COMPILE_LANGUAGE)
+    set(_compile_flags "SHELL:${OpenMP_CXX_FLAGS}")
 endif()
 
 if(NOT COMPILER_FAMILY_IS_MSVC)
-    if(BLT_ENABLE_CUDA AND BLT_OPENMP_FLAGS_DIFFER)
-        set(_compile_flags
-            $<$<AND:$<NOT:$<COMPILE_LANGUAGE:CUDA>>,$<NOT:$<COMPILE_LANGUAGE:Fortran>>>:${OpenMP_CXX_FLAGS}>
-            $<$<COMPILE_LANGUAGE:CUDA>:${_cuda_host_flag_prefix}${OpenMP_CXX_FLAGS}>
-            $<$<COMPILE_LANGUAGE:Fortran>:${OpenMP_Fortran_FLAGS}>)
-    elseif(BLT_ENABLE_CUDA)
-        set(_compile_flags
-            $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:${OpenMP_CXX_FLAGS}>
-            $<$<COMPILE_LANGUAGE:CUDA>:${_cuda_host_flag_prefix}${OpenMP_CXX_FLAGS}>)
-    elseif(BLT_OPENMP_FLAGS_DIFFER)
-        set(_compile_flags
-            $<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:${OpenMP_CXX_FLAGS}>
-            $<$<COMPILE_LANGUAGE:Fortran>:${OpenMP_Fortran_FLAGS}>)
+    if( ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.18.0" )
+        set(_link_exp LINK_LANGUAGE)
+    else()
+        set(_link_exp COMPILE_LANGUAGE)
     endif()
 
     if(BLT_OPENMP_FLAGS_DIFFER)

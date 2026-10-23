@@ -2,7 +2,7 @@
 # This is the shared configuration of jobs for tioga
 .on_tioga:
   variables:
-    ALLOC_COMMAND: "flux run -t15m -n1 --queue pci"
+    ALLOC_COMMAND: "flux run -t20m -n1 --queue pci"
   tags:
     - shell
     - tioga
