@@ -46,6 +46,9 @@ if(WIN32 AND BUILD_SHARED_LIBS)
     target_compile_definitions(example PUBLIC WIN32_SHARED_LIBS)
 endif()
 
+# Configure-time regression tests for target patching.
+add_subdirectory(src/patch_target_test)
+
 if(ENABLE_GTEST)
     #------------------------------------------------------
     # Add an executable

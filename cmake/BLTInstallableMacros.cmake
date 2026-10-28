@@ -601,8 +601,8 @@ endfunction(blt_convert_to_system_includes)
 ##                   LINK_FLAGS [ flag1 [ flag2 ..]]
 ##                   DEFINES [def1 [def2 ...]] )
 ##
-## Modifies an existing CMake target - sets PUBLIC visibility except for INTERFACE
-## libraries, which use INTERFACE visibility
+## Modifies an existing CMake target - sets PUBLIC visibility except for imported
+## targets and INTERFACE libraries, which use INTERFACE visibility
 ##------------------------------------------------------------------------------
 macro(blt_patch_target)
     set(singleValueArgs NAME TREAT_INCLUDES_AS_SYSTEM)
@@ -627,10 +627,11 @@ macro(blt_patch_target)
         message(FATAL_ERROR "blt_patch_target() NAME argument must be a native CMake target")
     endif()
 
-    # Default to public scope, unless it's an interface library
+    # Imported and interface libraries can only accept interface requirements.
     set(_scope PUBLIC)
     get_target_property(_target_type ${arg_NAME} TYPE)
-    if("${_target_type}" STREQUAL "INTERFACE_LIBRARY")
+    get_target_property(_target_imported ${arg_NAME} IMPORTED)
+    if(_target_imported OR "${_target_type}" STREQUAL "INTERFACE_LIBRARY")
         set(_scope INTERFACE)
     endif()
 
