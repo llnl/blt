@@ -355,7 +355,8 @@ blt_patch_target
 
 Modifies the properties of an existing target.  ``PUBLIC`` visibility
 is used unless the target is imported or an ``INTERFACE`` library, in which case
-``INTERFACE`` visibility is used.
+``INTERFACE`` visibility is used. For imported targets, this changes usage
+requirements inherited by consumers, not the imported library's own build steps.
 
 NAME
   Name of the CMake target to patch

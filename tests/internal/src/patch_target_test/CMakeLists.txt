@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2026, Lawrence Livermore National Security, LLC and
+# Copyright (c) Lawrence Livermore National Security, LLC and
 # other BLT Project Developers. See the top-level LICENSE file for details
 #
 # SPDX-License-Identifier: (BSD-3-Clause)
@@ -22,7 +22,10 @@ endfunction()
 
 add_library(patch_dependency INTERFACE)
 add_library(patch_library INTERFACE)
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/empty.cpp" "void patch_target_test() {}\n")
+# Avoid touching the source timestamp on each incremental reconfigure.
+if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/empty.cpp")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/empty.cpp" "void patch_target_test() {}\n")
+endif()
 add_library(patch_regular STATIC "${CMAKE_CURRENT_BINARY_DIR}/empty.cpp")
 add_library(patch_interface INTERFACE)
 
