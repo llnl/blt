@@ -19,6 +19,9 @@ The project release numbers follow [Semantic Versioning](http://semver.org/spec/
 - Hardened CUDA smoke tests and tests against kernels not launching.
 - `blt::openmp` now appends `SHELL:` before flags to handle compilers that require multiple OpenMP flags (like apple-clang).
 
+### Fixed
+- Fixed MPI Fortran compile options being incorrectly applied to C/C++ sources.
+
 ### Removed
 - Remove ENABLE_CLANG_CUDA and BLT_CLANG_CUDA_ARCH
 - Remove legacy CUDA link-rule overrides that were needed for `FindCUDA`, including custom `CMAKE_CUDA_LINK_EXECUTABLE/`device-link rules and CUDA rpath flag overrides.
