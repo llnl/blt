@@ -33,6 +33,21 @@ if(TEST_MAKE_PROGRAM)
     list(APPEND _cmake_args "-DCMAKE_MAKE_PROGRAM=${TEST_MAKE_PROGRAM}")
 endif()
 
+# The parent may be configured with explicit FindOpenMP flags/runtime paths,
+# particularly AppleClang with Homebrew libomp. Preserve those toolchain
+# settings while keeping each discovery case in a fresh CMake cache.
+foreach(_lang IN ITEMS C CXX Fortran)
+    if(TEST_OpenMP_${_lang}_FLAGS)
+        list(APPEND _cmake_args "-DOpenMP_${_lang}_FLAGS=${TEST_OpenMP_${_lang}_FLAGS}")
+    endif()
+    if(TEST_OpenMP_${_lang}_LIB_NAMES)
+        list(APPEND _cmake_args "-DOpenMP_${_lang}_LIB_NAMES=${TEST_OpenMP_${_lang}_LIB_NAMES}")
+    endif()
+endforeach()
+if(TEST_OpenMP_omp_LIBRARY)
+    list(APPEND _cmake_args "-DOpenMP_omp_LIBRARY=${TEST_OpenMP_omp_LIBRARY}")
+endif()
+
 execute_process(COMMAND "${CMAKE_COMMAND}" ${_cmake_args}
                 RESULT_VARIABLE _result)
 if(NOT _result EQUAL 0)

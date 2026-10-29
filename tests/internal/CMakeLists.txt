@@ -62,6 +62,13 @@ if(ENABLE_OPENMP)
                          "-DTEST_C_COMPILER=${CMAKE_C_COMPILER}"
                          "-DTEST_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
                          "-DTEST_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}"
+                         "-DTEST_OpenMP_C_FLAGS=${OpenMP_C_FLAGS}"
+                         "-DTEST_OpenMP_CXX_FLAGS=${OpenMP_CXX_FLAGS}"
+                         "-DTEST_OpenMP_Fortran_FLAGS=${OpenMP_Fortran_FLAGS}"
+                         "-DTEST_OpenMP_C_LIB_NAMES=${OpenMP_C_LIB_NAMES}"
+                         "-DTEST_OpenMP_CXX_LIB_NAMES=${OpenMP_CXX_LIB_NAMES}"
+                         "-DTEST_OpenMP_Fortran_LIB_NAMES=${OpenMP_Fortran_LIB_NAMES}"
+                         "-DTEST_OpenMP_omp_LIBRARY=${OpenMP_omp_LIBRARY}"
                          -P "${CMAKE_CURRENT_SOURCE_DIR}/src/openmp_discovery_test/run_configure.cmake")
     endforeach()
 endif()
