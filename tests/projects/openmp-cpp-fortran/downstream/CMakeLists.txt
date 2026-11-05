@@ -26,7 +26,7 @@ set_source_files_properties(
 
 get_target_property(imported_omp_flags openmp INTERFACE_COMPILE_OPTIONS)
 
-SET(expected_omp_flags $<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:-fopenmp=libomp>;$<$<COMPILE_LANGUAGE:Fortran>:-fopenmp>)
+set(expected_omp_flags $<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:SHELL:-fopenmp=libomp>;$<$<COMPILE_LANGUAGE:Fortran>:SHELL:-fopenmp>)
 
 # The below print statement should emit the generator expression for the OMP flags,
 # which is necessary because the flag is CPP and Fortran compiler dependent.

@@ -1,5 +1,5 @@
-# Copyright (c) 2017-2025, Lawrence Livermore National Security, LLC and
-# other BLT Project Developers. See the top-level LICENSE file for details
+# Copyright (c) Lawrence Livermore National Security, LLC and other
+# BLT Project Developers. See the top-level LICENSE file for details
 #
 # SPDX-License-Identifier: (BSD-3-Clause)
 
@@ -77,7 +77,7 @@ if (BLT_ENABLE_FIND_MPI)
     if (BLT_ENABLE_FORTRAN)
         set(_f_flag ${MPI_Fortran_${_mpi_compile_flags_suffix}})
         if (_f_flag AND NOT "${_c_flag}" STREQUAL "${_f_flag}")
-            list(APPEND _mpi_compile_flags ${_f_flag})
+            list(APPEND _mpi_compile_flags "$<$<COMPILE_LANGUAGE:Fortran>:${_f_flag}>")
         endif()
     endif()
     unset(_c_flag)
