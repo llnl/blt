@@ -1,11 +1,11 @@
 ####
-# This is the shared configuration of jobs for tioga
-.on_tioga:
+# This is the shared configuration of jobs for tuolumne
+.on_tuolumne:
   variables:
-    ALLOC_COMMAND: "flux run -t20m -n1 --queue pci"
+    SCHEDULER_PARAMETERS: "--queue pci -n1 -t 20"
   tags:
-    - shell
-    - tioga
+    - batch
+    - tuolumne
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /_qnone/ || $ON_TIOGA == "OFF"' #run except if ...
       when: never
@@ -17,7 +17,7 @@
 tioga-clang_18_0_0_hip:
   variables:
     HOST_CONFIG: "clang@18.0.0_hip.cmake"
-  extends: [.build_script, .on_tioga]
+  extends: [.build_script, .on_tuolumne]
 
 ####
 # HIP project tests
@@ -25,10 +25,10 @@ tioga-clang_18.0.0_hip_config_test:
   variables:
     ENABLED_BLT_TESTS: "hip-config-test"
     HOST_CONFIG: "clang@18.0.0_hip.cmake"
-  extends: [.run_project_integration_tests, .on_tioga]
+  extends: [.run_project_integration_tests, .on_tuolumne]
 
 tioga-gcc_10.3.1_clang_17.0.0_hip_config_test:
   variables:
     ENABLED_BLT_TESTS: "hip-config-test"
     HOST_CONFIG: "gcc@10.3.1_clang@17.0.0_hip.cmake"
-  extends: [.run_project_integration_tests, .on_tioga]
+  extends: [.run_project_integration_tests, .on_tuolumne]
