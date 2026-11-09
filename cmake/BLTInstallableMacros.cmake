@@ -629,7 +629,7 @@ macro(blt_patch_target)
         message(FATAL_ERROR "blt_patch_target() NAME argument must be a native CMake target")
     endif()
 
-    # Imported and interface libraries can only accept interface requirements.
+    # Determine scope: PUBLIC by default, INTERFACE for imported targets and interface libraries.
     set(_blt_patch_target_scope PUBLIC)
     get_target_property(_target_type ${arg_NAME} TYPE)
     get_target_property(_blt_patch_target_imported ${arg_NAME} IMPORTED)
