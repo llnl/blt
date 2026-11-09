@@ -87,53 +87,55 @@ macro(blt_inherit_target_info)
         message( FATAL_ERROR "Must provide a FROM argument to the 'blt_inherit_target' macro" )
     endif()
 
-    blt_determine_scope(TARGET ${arg_TO} OUT _scope)
+    blt_determine_scope(TARGET ${arg_TO} OUT _blt_inherit_target_info_scope)
 
     get_target_property(_interface_system_includes
                         ${arg_FROM} INTERFACE_SYSTEM_INCLUDE_DIRECTORIES)
     if ( _interface_system_includes )
-        target_include_directories(${arg_TO} SYSTEM ${_scope} ${_interface_system_includes})
+        target_include_directories(${arg_TO} SYSTEM ${_blt_inherit_target_info_scope} ${_interface_system_includes})
     endif()
 
     get_target_property(_interface_includes
                         ${arg_FROM} INTERFACE_INCLUDE_DIRECTORIES)
     if ( _interface_includes )
-        target_include_directories(${arg_TO} ${_scope} ${_interface_includes})
+        target_include_directories(${arg_TO} ${_blt_inherit_target_info_scope} ${_interface_includes})
     endif()
 
     get_target_property(_interface_defines
                         ${arg_FROM} INTERFACE_COMPILE_DEFINITIONS)
     if ( _interface_defines )
-        target_compile_definitions( ${arg_TO} ${_scope} ${_interface_defines})
+        target_compile_definitions( ${arg_TO} ${_blt_inherit_target_info_scope} ${_interface_defines})
     endif()
 
     if( ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13.0" )
         get_target_property(_interface_link_options
                             ${arg_FROM} INTERFACE_LINK_OPTIONS)
         if ( _interface_link_options )
-            target_link_options( ${arg_TO} ${_scope} ${_interface_link_options})
+            target_link_options( ${arg_TO} ${_blt_inherit_target_info_scope} ${_interface_link_options})
         endif()
     endif()
 
     get_target_property(_interface_compile_options
                         ${arg_FROM} INTERFACE_COMPILE_OPTIONS)
     if ( _interface_compile_options )
-        target_compile_options( ${arg_TO} ${_scope} ${_interface_compile_options})
+        target_compile_options( ${arg_TO} ${_blt_inherit_target_info_scope} ${_interface_compile_options})
     endif()
 
     if ( NOT arg_OBJECT )
         get_target_property(_interface_link_directories
                             ${arg_FROM} INTERFACE_LINK_DIRECTORIES)
         if ( _interface_link_directories )
-            target_link_directories( ${arg_TO} ${_scope} ${_interface_link_directories})
+            target_link_directories( ${arg_TO} ${_blt_inherit_target_info_scope} ${_interface_link_directories})
         endif()
 
         get_target_property(_interface_link_libraries
                             ${arg_FROM} INTERFACE_LINK_LIBRARIES)
         if ( _interface_link_libraries )
-            target_link_libraries( ${arg_TO} ${_scope} ${_interface_link_libraries})
+            target_link_libraries( ${arg_TO} ${_blt_inherit_target_info_scope} ${_interface_link_libraries})
         endif()
     endif()
+
+    unset(_blt_inherit_target_info_scope)
 
 endmacro(blt_inherit_target_info)
 
@@ -239,14 +241,14 @@ macro(blt_add_target_link_flags)
             # In CMake 3.13+, LINK_FLAGS was converted to LINK_OPTIONS.
             # This now supports generator expressions and scoping but expects a list
             # not a string
-            blt_determine_scope(TARGET ${arg_TO} SCOPE "${arg_SCOPE}" OUT _scope)
+            blt_determine_scope(TARGET ${arg_TO} SCOPE "${arg_SCOPE}" OUT _blt_add_target_link_flags_scope)
 
             # Note: "SHELL:"" causes the flags to be not de-duplicated and parsed with
             # separate_arguments
             if(NOT "${arg_FLAGS}" MATCHES SHELL:)
-                target_link_options(${arg_TO} ${_scope} SHELL:${arg_FLAGS})
+                target_link_options(${arg_TO} ${_blt_add_target_link_flags_scope} SHELL:${arg_FLAGS})
             else()
-                target_link_options(${arg_TO} ${_scope} ${arg_FLAGS})
+                target_link_options(${arg_TO} ${_blt_add_target_link_flags_scope} ${arg_FLAGS})
             endif()
         else()
             # In CMake <= 3.12, there is no target_link_flags or target_link_options command
@@ -280,7 +282,7 @@ macro(blt_add_target_link_flags)
     unset(_flags)
     unset(_link_flags)
     unset(_link_flags_str)
-    unset(_scope)
+    unset(_blt_add_target_link_flags_scope)
 
 endmacro(blt_add_target_link_flags)
 
@@ -370,15 +372,15 @@ macro(blt_add_target_definitions)
         message(FATAL_ERROR "Target ${arg_TO} passed to blt_add_target_definitions is not a valid cmake target")    
     endif()
 
-    blt_determine_scope(TARGET ${arg_TO} SCOPE "${arg_SCOPE}" OUT _scope)
+    blt_determine_scope(TARGET ${arg_TO} SCOPE "${arg_SCOPE}" OUT _blt_add_target_definitions_scope)
 
     # Only add the flag if it is not empty
     string(STRIP "${arg_TARGET_DEFINITIONS}" _strippedDefs)
     if(NOT "${_strippedDefs}" STREQUAL "")
-        target_compile_definitions(${arg_TO} ${_scope} ${_strippedDefs})
+        target_compile_definitions(${arg_TO} ${_blt_add_target_definitions_scope} ${_strippedDefs})
     endif()
 
-    unset(_scope)
+    unset(_blt_add_target_definitions_scope)
     unset(_strippedDefs)
 
 endmacro(blt_add_target_definitions)
@@ -407,7 +409,7 @@ macro(blt_add_target_compile_flags)
         message(FATAL_ERROR "Target ${arg_TO} passed to blt_add_target_compile_flags is not a valid cmake target")    
     endif()
 
-    blt_determine_scope(TARGET ${arg_TO} SCOPE "${arg_SCOPE}" OUT _scope)
+    blt_determine_scope(TARGET ${arg_TO} SCOPE "${arg_SCOPE}" OUT _blt_add_target_compile_flags_scope)
 
     # Only add the flag if it is not empty
     string(STRIP "${arg_FLAGS}" _strippedFlags)
@@ -417,12 +419,12 @@ macro(blt_add_target_compile_flags)
             set_property(TARGET ${arg_NAME} APPEND PROPERTY
                          INTERFACE_COMPILE_OPTIONS ${_strippedFlags})
         else()
-            target_compile_options(${arg_TO} ${_scope} ${_strippedFlags})
+            target_compile_options(${arg_TO} ${_blt_add_target_compile_flags_scope} ${_strippedFlags})
         endif()
     endif()
 
     unset(_strippedFlags)
-    unset(_scope)
+    unset(_blt_add_target_compile_flags_scope)
 
 endmacro(blt_add_target_compile_flags)
 
@@ -628,11 +630,11 @@ macro(blt_patch_target)
     endif()
 
     # Imported and interface libraries can only accept interface requirements.
-    set(_scope PUBLIC)
+    set(_blt_patch_target_scope PUBLIC)
     get_target_property(_target_type ${arg_NAME} TYPE)
-    get_target_property(_target_imported ${arg_NAME} IMPORTED)
-    if(_target_imported OR "${_target_type}" STREQUAL "INTERFACE_LIBRARY")
-        set(_scope INTERFACE)
+    get_target_property(_blt_patch_target_imported ${arg_NAME} IMPORTED)
+    if(_blt_patch_target_imported OR "${_target_type}" STREQUAL "INTERFACE_LIBRARY")
+        set(_blt_patch_target_scope INTERFACE)
     endif()
 
     # Interface libraries were heavily restricted pre-3.11
@@ -654,7 +656,7 @@ macro(blt_patch_target)
     endif()
 
     if(_standard_lib_interface)
-        target_link_libraries(${arg_NAME} ${_scope} ${_libs_to_link})
+        target_link_libraries(${arg_NAME} ${_blt_patch_target_scope} ${_libs_to_link})
     else()
         set_property(TARGET ${arg_NAME} APPEND PROPERTY
                      INTERFACE_LINK_LIBRARIES ${_libs_to_link})
@@ -662,7 +664,7 @@ macro(blt_patch_target)
         
     if( arg_INCLUDES )
         if(_standard_lib_interface)
-            target_include_directories(${arg_NAME} ${_scope} ${arg_INCLUDES})
+            target_include_directories(${arg_NAME} ${_blt_patch_target_scope} ${arg_INCLUDES})
         else()
             # Interface include directories need to be set manually
             set_property(TARGET ${arg_NAME} APPEND PROPERTY 
@@ -676,26 +678,29 @@ macro(blt_patch_target)
 
     # FIXME: Is this all that's needed?
     if( arg_FORTRAN_MODULES )
-        target_include_directories(${arg_NAME} ${_scope} ${arg_FORTRAN_MODULES})
+        target_include_directories(${arg_NAME} ${_blt_patch_target_scope} ${arg_FORTRAN_MODULES})
     endif()
 
     if( arg_COMPILE_FLAGS )
         blt_add_target_compile_flags(TO ${arg_NAME} 
-                                     SCOPE ${_scope}
+                                     SCOPE ${_blt_patch_target_scope}
                                      FLAGS ${arg_COMPILE_FLAGS})
     endif()
     
     if( arg_LINK_FLAGS )
         blt_add_target_link_flags(TO ${arg_NAME} 
-                                  SCOPE ${_scope}
+                                  SCOPE ${_blt_patch_target_scope}
                                   FLAGS ${arg_LINK_FLAGS})
     endif()
     
     if( arg_DEFINES )
         blt_add_target_definitions(TO ${arg_NAME} 
-                                   SCOPE ${_scope}
+                                   SCOPE ${_blt_patch_target_scope}
                                    TARGET_DEFINITIONS ${arg_DEFINES})
     endif()
+
+    unset(_blt_patch_target_scope)
+    unset(_blt_patch_target_imported)
 
 endmacro(blt_patch_target)
 
@@ -755,6 +760,5 @@ macro(blt_import_library)
         FORTRAN_MODULES ${arg_FORTRAN_MODULES}
         COMPILE_FLAGS ${arg_COMPILE_FLAGS}
         LINK_FLAGS ${arg_LINK_FLAGS}
-        DEFINES ${arg_DEFINES}
     )
 endmacro(blt_import_library)
