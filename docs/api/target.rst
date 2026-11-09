@@ -343,7 +343,7 @@ blt_patch_target
 
 .. code-block:: cmake
 
-    blt_patch_target( NAME                     <libname>
+    blt_patch_target( NAME                     <targetname>
                       DEPENDS_ON               [dep1 [dep2 ...]]
                       INCLUDES                 [include1 [include2 ...]]
                       TREAT_INCLUDES_AS_SYSTEM [ON|OFF]
@@ -353,47 +353,75 @@ blt_patch_target
                       LINK_FLAGS               [flag1 [flag2 ..]]
                       DEFINES                  [def1 [def2 ...]] )
 
-Modifies the properties of an existing target.  ``PUBLIC`` visibility
-is used unless the target is imported or an ``INTERFACE`` library, in which case
-``INTERFACE`` visibility is used. For imported targets, this changes usage
-requirements inherited by consumers, not the imported library's own build steps.
+Modifies the properties of an existing target using the widest scope appropriate
+for its target type.
 
 NAME
   Name of the CMake target to patch
 
 DEPENDS_ON
-  List of CMake targets that this target depends on
+  CMake targets to add as link dependencies
 
 INCLUDES
-  List of include directories to be inherited by dependent targets
+  Include directories to add to the target
 
 TREAT_INCLUDES_AS_SYSTEM
   Whether to inform the compiler to treat this target's include paths
   as system headers - this applies to all include paths for the target,
-  not just those specifies in the ``INCLUDES`` parameter.  Only some
+  not just those specified in the ``INCLUDES`` parameter.  Only some
   compilers support this. This is useful if the headers generate warnings
   you want to not have them reported in your build. This defaults to ``OFF``.
 
 FORTRAN_MODULES
-  Fortran module directories to be inherited by dependent targets
+  Fortran module directories to add as include directories
 
 LIBRARIES
-  List of CMake targets and library files (.a/.so/.lib/.dll) that make up
-  this target, used for libraries
+  CMake targets and library files (.a/.so/.lib/.dll) to add as link dependencies.
 
 COMPILE_FLAGS
-  List of compiler flags to be inherited by dependent targets
+  Compiler flags to add to the target
 
 LINK_FLAGS
-  List of linker flags to be inherited by dependent targets
+  Linker flags to add to the target
 
 DEFINES
-  List of compiler defines to be inherited by dependent targets
+  Preprocessor definitions to add to the target
 
-This macro does not create a target, it is intended to be used with CMake
-targets created via another BLT macro or CMake command.  Unlike :ref:`blt_register_library`,
-it modifies the specified target, updating the CMake properties of the target that correspond
-to each of the parameters.
+This macro updates the properties of a previously created CMake target according
+to the arguments supplied. It does not create targets.
+
+The ``PUBLIC`` scope applies properties to the target and passes them to
+consumers. The ``INTERFACE`` scope passes properties to consumers only.
+Non-imported executables and libraries built by the project use ``PUBLIC``
+scope. Interface libraries and all imported targets use ``INTERFACE`` scope.
+
+.. list-table:: Scope used by ``blt_patch_target``
+   :header-rows: 1
+
+   * - Target type
+     - Non-imported
+     - Imported
+   * - ``EXECUTABLE``
+     - ``PUBLIC``
+     - ``INTERFACE``
+   * - ``STATIC_LIBRARY``
+     - ``PUBLIC``
+     - ``INTERFACE``
+   * - ``SHARED_LIBRARY``
+     - ``PUBLIC``
+     - ``INTERFACE``
+   * - ``MODULE_LIBRARY``
+     - ``PUBLIC``
+     - ``INTERFACE``
+   * - ``OBJECT_LIBRARY``
+     - ``PUBLIC``
+     - ``INTERFACE``
+   * - ``INTERFACE_LIBRARY``
+     - ``INTERFACE``
+     - ``INTERFACE``
+   * - ``UNKNOWN_LIBRARY``
+     - Not applicable
+     - ``INTERFACE``
 
 .. warning::
   The ``DEPENDS_ON`` and ``LIBRARIES`` parameters cannot be used when patching a target
