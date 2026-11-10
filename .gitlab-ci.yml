@@ -6,8 +6,6 @@
 variables:
   PROJECT_ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
   BUILD_ROOT: ${CI_PROJECT_DIR}
-  #LLNL_SERVICE_USER: atk
-  #CUSTOM_CI_BUILDS_DIR: /usr/workspace/atk/gitlab-runner
 
 ####
 # Template
@@ -15,7 +13,7 @@ variables:
   script:
     - echo -e "section_start:$(date +%s):build_and_test\r\e[0K
       Build and test ${CI_PROJECT_NAME}"
-    - ${ALLOC_COMMAND} .gitlab/build_and_test.sh
+    - .gitlab/build_and_test.sh
     - echo -e "section_end:$(date +%s):build_and_test\r\e[0K"
   artifacts:
     reports:
@@ -27,7 +25,7 @@ variables:
   script:
     - echo -e "section_start:$(date +%s):run_project_integration_tests\r\e[0K
       Run project integration tests ${CI_PROJECT_NAME}"
-    - ${ALLOC_COMMAND} .gitlab/run_project_integration_tests.sh
+    - .gitlab/run_project_integration_tests.sh
     - echo -e "section_end:$(date +%s):build_and_test\r\e[0K"
   artifacts:
     reports:
@@ -38,7 +36,7 @@ variables:
 include:
   - local: .gitlab/build_matrix.yml
   - local: .gitlab/build_dane.yml
-  - local: .gitlab/build_tioga.yml
+  - local: .gitlab/build_tuolumne.yml
   # ID token requirement for Gitlab 17.0+
   - project: 'lc-templates/id_tokens'
     file: 'id_tokens.yml'
