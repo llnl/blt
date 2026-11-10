@@ -49,7 +49,7 @@ set(ENABLE_HIP ON CACHE BOOL "")
 
 set(CMAKE_HIP_COMPILER "${_rocm_root}/bin/amdclang++" CACHE PATH "")
 
-set(CMAKE_HIP_ARCHITECTURES "gfx90a" CACHE STRING "")
+set(CMAKE_HIP_ARCHITECTURES "gfx942" CACHE STRING "")
 
 #------------------------------------------------
 # Hardware Specifics
