@@ -7,7 +7,7 @@
     - batch
     - tuolumne
   rules:
-    - if: '$CI_COMMIT_BRANCH =~ /_qnone/ || $ON_TIOGA == "OFF"' #run except if ...
+    - if: '$CI_COMMIT_BRANCH =~ /_qnone/ || $ON_TUOLUMNE == "OFF"' #run except if ...
       when: never
     - when: on_success
 
