@@ -57,7 +57,7 @@ set(ROCM_ROOT_DIR "/opt/rocm-6.2.1" CACHE PATH "")
 
 set(ENABLE_HIP ON CACHE BOOL "")
 
-set(CMAKE_HIP_ARCHITECTURES "gfx90a" CACHE STRING "")
+set(CMAKE_HIP_ARCHITECTURES "gfx942" CACHE STRING "")
 
 set(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags -L${ROCM_ROOT_DIR}/llvm/lib -L${ROCM_ROOT_DIR}/lib -Wl,-rpath,${ROCM_ROOT_DIR}/llvm/lib:${ROCM_ROOT_DIR}/lib -lpgmath -lflang -lflangrti -lompstub -lamdhip64  -L${ROCM_ROOT_DIR}/lib64 -Wl,-rpath,${ROCM_ROOT_DIR}/lib64  -L${ROCM_ROOT_DIR}/lib -Wl,-rpath,${ROCM_ROOT_DIR}/lib -lamd_comgr -lhsa-runtime64 " CACHE STRING "")
 
