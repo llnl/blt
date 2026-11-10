@@ -2,7 +2,7 @@
 # This is the shared configuration of jobs for tuolumne
 .on_tuolumne:
   variables:
-    SCHEDULER_PARAMETERS: "--queue pci -n1 -t 20"
+    SCHEDULER_PARAMETERS: "--queue pci -n1 -t 20m"
   tags:
     - batch
     - tuolumne
