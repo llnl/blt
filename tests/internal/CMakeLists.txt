@@ -46,6 +46,33 @@ if(WIN32 AND BUILD_SHARED_LIBS)
     target_compile_definitions(example PUBLIC WIN32_SHARED_LIBS)
 endif()
 
+if(ENABLE_OPENMP)
+    foreach(_case initial existing partial)
+        add_test(NAME openmp_discovery_${_case}
+                 COMMAND ${CMAKE_COMMAND}
+                         "-DTEST_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}/src/openmp_discovery_test"
+                         "-DTEST_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}/openmp_discovery_${_case}"
+                         "-DTEST_GENERATOR=${CMAKE_GENERATOR}"
+                         "-DTEST_GENERATOR_PLATFORM=${CMAKE_GENERATOR_PLATFORM}"
+                         "-DTEST_GENERATOR_TOOLSET=${CMAKE_GENERATOR_TOOLSET}"
+                         "-DTEST_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
+                         "-DBLT_SOURCE_DIR=${BLT_SOURCE_DIR}"
+                         "-DDISCOVERY_CASE=${_case}"
+                         "-DENABLE_FORTRAN=${ENABLE_FORTRAN}"
+                         "-DTEST_C_COMPILER=${CMAKE_C_COMPILER}"
+                         "-DTEST_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                         "-DTEST_Fortran_COMPILER=${CMAKE_Fortran_COMPILER}"
+                         "-DTEST_OpenMP_C_FLAGS=${OpenMP_C_FLAGS}"
+                         "-DTEST_OpenMP_CXX_FLAGS=${OpenMP_CXX_FLAGS}"
+                         "-DTEST_OpenMP_Fortran_FLAGS=${OpenMP_Fortran_FLAGS}"
+                         "-DTEST_OpenMP_C_LIB_NAMES=${OpenMP_C_LIB_NAMES}"
+                         "-DTEST_OpenMP_CXX_LIB_NAMES=${OpenMP_CXX_LIB_NAMES}"
+                         "-DTEST_OpenMP_Fortran_LIB_NAMES=${OpenMP_Fortran_LIB_NAMES}"
+                         "-DTEST_OpenMP_omp_LIBRARY=${OpenMP_omp_LIBRARY}"
+                         -P "${CMAKE_CURRENT_SOURCE_DIR}/src/openmp_discovery_test/run_configure.cmake")
+    endforeach()
+endif()
+
 if(ENABLE_GTEST)
     #------------------------------------------------------
     # Add an executable
