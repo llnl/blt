@@ -296,8 +296,7 @@ endmacro(blt_add_target_link_flags)
 ## in BLT macros.
 ##
 ## TARGET - Name of CMake Target that the property is being added to
-##          Note: the only real purpose of this parameter is to make sure we aren't
-##                adding returning other than INTERFACE for Interface Libraries
+##          Interface libraries and imported targets use INTERFACE scope.
 ## SCOPE  - case-insensitive scope string, defaults to PUBLIC
 ## OUT    - variable that is filled with the uppercased scope
 ##
@@ -328,14 +327,16 @@ macro(blt_determine_scope)
 
     if(TARGET ${arg_TARGET})
         get_property(_targetType TARGET ${arg_TARGET} PROPERTY TYPE)
-        if(${_targetType} STREQUAL "INTERFACE_LIBRARY")
-            # Interface targets can only set INTERFACE
+        get_property(_targetImported TARGET ${arg_TARGET} PROPERTY IMPORTED)
+        if("${_targetType}" STREQUAL "INTERFACE_LIBRARY" OR _targetImported)
+            # Interface libraries and imported targets can only set INTERFACE
             if("${_uppercaseScope}" STREQUAL "PUBLIC" OR
                "${_uppercaseScope}" STREQUAL "INTERFACE")
                 set(${arg_OUT} INTERFACE)
             else()
-                message(FATAL_ERROR "Cannot set PRIVATE scope to Interface Library."
-                                    "Change to Scope to INTERFACE.")
+                message(FATAL_ERROR "Cannot set PRIVATE scope on target ${arg_TARGET}. "
+                                    "Interface libraries and imported targets only "
+                                    "accept INTERFACE scope.")
             endif()
         else()
             set(${arg_OUT} ${_uppercaseScope})
@@ -345,6 +346,7 @@ macro(blt_determine_scope)
     endif()
 
     unset(_targetType)
+    unset(_targetImported)
     unset(_uppercaseScope)
 
 endmacro(blt_determine_scope)
@@ -630,12 +632,8 @@ macro(blt_patch_target)
     endif()
 
     # Determine scope: PUBLIC by default, INTERFACE for imported targets and interface libraries.
-    set(_blt_patch_target_scope PUBLIC)
+    blt_determine_scope(TARGET ${arg_NAME} OUT _blt_patch_target_scope)
     get_target_property(_target_type ${arg_NAME} TYPE)
-    get_target_property(_blt_patch_target_imported ${arg_NAME} IMPORTED)
-    if(_blt_patch_target_imported OR "${_target_type}" STREQUAL "INTERFACE_LIBRARY")
-        set(_blt_patch_target_scope INTERFACE)
-    endif()
 
     # Interface libraries were heavily restricted pre-3.11
     set(_standard_lib_interface FALSE)
@@ -700,7 +698,6 @@ macro(blt_patch_target)
     endif()
 
     unset(_blt_patch_target_scope)
-    unset(_blt_patch_target_imported)
 
 endmacro(blt_patch_target)
 
