@@ -35,10 +35,7 @@ foreach(type STATIC SHARED UNKNOWN INTERFACE)
     list(APPEND patch_targets patch_imported_${type})
 endforeach()
 
-set(_patch_target_link_args)
-if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.13")
-    set(_patch_target_link_args LINK_FLAGS "SHELL:patch_target_link_flag")
-endif()
+set(_patch_target_link_args LINK_FLAGS "SHELL:patch_target_link_flag")
 
 foreach(target ${patch_targets})
     blt_patch_target(NAME ${target} LIBRARIES patch_library)
