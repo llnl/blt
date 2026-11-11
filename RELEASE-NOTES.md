@@ -21,7 +21,7 @@ The project release numbers follow [Semantic Versioning](http://semver.org/spec/
 
 ### Fixed
 - Fixed MPI Fortran compile options being incorrectly applied to C/C++ sources.
-- Use `INTERFACE` scope when `blt_patch_target` and `blt_determine_scope` modifies imported targets.
+- Use `INTERFACE` scope for imported targets in `blt_patch_target` and `blt_determine_scope`.
 
 ### Removed
 - Remove ENABLE_CLANG_CUDA and BLT_CLANG_CUDA_ARCH
